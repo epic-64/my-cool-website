@@ -56,7 +56,11 @@ object HelloWorldServer {
         respondWithHeader(RawHeader("Cache-Control", "public, max-age=86400")) {
           getFromResourceDirectory("public/assets") // Serve files
         }
-      }
+      },
+
+      path("404") {
+        complete("<html><h1>404 - Not Found</h1></html>") // Simple HTML 404
+      },
     )
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
