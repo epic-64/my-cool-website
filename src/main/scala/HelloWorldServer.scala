@@ -30,6 +30,10 @@ object HelloWorldServer {
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
     val routes = concat(
+      pathSingleSlash {
+        getFromResource("public/index.html")
+      },
+
       path("hello")(complete("Hello, world!")),
       path("goodbye")(complete("Goodbye, world!")),
       path("ping")(complete("pong")),
