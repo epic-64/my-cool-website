@@ -1,3 +1,9 @@
+![Coverage](https://epic-64.github.io/my-cool-website/coverage/coverage-badge.svg)
+
+[View Coverage Report](https://epic-64.github.io/my-cool-website/coverage/index.html)
+
+[Source Code](https://github.com/epic-64/my-cool-website)
+
 ## Set the correct git user for the project
 ```
 git config user.name "github username"
