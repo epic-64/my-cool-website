@@ -13,3 +13,12 @@ git-privacy init
 ```bash
 git config privacy.pattern hms
 ```
+
+## Add gitignore
+This should cover 95% of the stuff you don't want to commit.
+```
+.idea
+/project/target/
+/project/project/target/
+/target/
+```
