@@ -49,3 +49,7 @@ rewrite.rules = [RedundantBraces, RedundantParens]
 binPack.parentConstructors = false
 trailingCommas = keep
 ```
+
+## Coverage Pages
+Go to the project settings and set the pages to the `gh-pages` branch.
+https://github.com/epic-64/my-cool-website/settings/pages
