@@ -1,8 +1,10 @@
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
+import spray.json.DefaultJsonProtocol.*
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
+import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives.*
-import spray.json.DefaultJsonProtocol.* // Provides JSON serialization
+import akka.http.scaladsl.server.directives.FileAndResourceDirectives.getFromResourceDirectory
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
@@ -19,7 +21,7 @@ case class MultiplyResult(x: Int, y: Int, product: Int)
 
 // ✅ JSON formatters (required for automatic JSON handling)
 given spray.json.RootJsonFormat[MultiplyRequest] = jsonFormat2(MultiplyRequest.apply)
-given spray.json.RootJsonFormat[MultiplyResult] = jsonFormat3(MultiplyResult.apply)
+given spray.json.RootJsonFormat[MultiplyResult]  = jsonFormat3(MultiplyResult.apply)
 
 object HelloWorldServer {
 
@@ -43,6 +45,12 @@ object HelloWorldServer {
             val result = MultiplyResult(request.x, request.y, request.x * request.y)
             complete(result) // Automatically converted to JSON
           }
+        }
+      },
+
+      pathPrefix("assets") {
+        respondWithHeader(RawHeader("Cache-Control", "public, max-age=86400")) {
+          getFromResourceDirectory("public/assets") // Serve files
         }
       }
     )
