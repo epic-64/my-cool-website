@@ -13,9 +13,10 @@ object HelloWorldServer {
 
     // Define multiple routes
     val routes = concat(
-      path("hello")    { complete("Hello, world!") },
-      path("goodbye")  { complete("Goodbye, world!") },
-      path("ping")     { complete("pong") }
+      path("hello")(complete("Hello, world!")),
+      path("goodbye")(complete("Goodbye, world!")),
+      path("ping")(complete("pong")),
+      path("hello" / Segment)(name => complete(s"Hello, $name!"))
     )
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
