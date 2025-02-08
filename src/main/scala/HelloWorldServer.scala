@@ -57,7 +57,8 @@ object HelloWorldServer {
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
 
-    println("Server running at http://localhost:8080/\nPress RETURN to stop...")
+    println("Server running at http://localhost:8080/")
+    println("Press RETURN to stop...")
     StdIn.readLine() // Wait for user to press Enter
 
     bindingFuture
