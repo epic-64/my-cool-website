@@ -2,16 +2,24 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.server.Directives.*
-import spray.json.DefaultJsonProtocol.* // Provides JSON formatting
+import spray.json.DefaultJsonProtocol.* // Provides JSON serialization
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
-// ✅ Define a case class for the JSON response
+// ✅ Define a case class for the response
 case class SumResult(x: Int, y: Int, sum: Int)
 
-// ✅ Create a JSON formatter (needed for automatic conversion)
+// ✅ Add an implicit JSON format
 given spray.json.RootJsonFormat[SumResult] = jsonFormat3(SumResult.apply)
+
+// ✅ Define case classes for JSON input and response
+case class MultiplyRequest(x: Int, y: Int)
+case class MultiplyResult(x: Int, y: Int, product: Int)
+
+// ✅ JSON formatters (required for automatic JSON handling)
+given spray.json.RootJsonFormat[MultiplyRequest] = jsonFormat2(MultiplyRequest.apply)
+given spray.json.RootJsonFormat[MultiplyResult] = jsonFormat3(MultiplyResult.apply)
 
 object HelloWorldServer {
 
@@ -24,10 +32,18 @@ object HelloWorldServer {
       path("goodbye")(complete("Goodbye, world!")),
       path("ping")(complete("pong")),
       path("hello" / Segment)(name => complete(s"Hello, $name!")),
-
-      // ✅ JSON response for /add/{x}/{y}
       path("add" / IntNumber / IntNumber) { (x, y) =>
-        complete(SumResult(x, y, x + y)) // Automatically converts to JSON
+        complete(SumResult(x, y, x + y)) // Now it works!
+      },
+
+      // ✅ NEW: POST /multiply endpoint that receives JSON input
+      path("multiply") {
+        post {
+          entity(as[MultiplyRequest]) { request =>
+            val result = MultiplyResult(request.x, request.y, request.x * request.y)
+            complete(result) // Automatically converted to JSON
+          }
+        }
       }
     )
 
