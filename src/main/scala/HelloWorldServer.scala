@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
 object HelloWorldServer {
-
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem                        = ActorSystem("my-actor-system")
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
@@ -16,7 +15,7 @@ object HelloWorldServer {
       path("goodbye")(complete("Goodbye, world!")),
       path("ping")(complete("pong")),
       path("hello" / Segment)(name => complete(s"Hello, $name!")),
-      path("add" / IntNumber / IntNumber) { (x, y) => complete(s"The sum is: ${x + y}") }
+      path("add" / IntNumber / IntNumber)((x, y) => complete(s"The sum is: ${x + y}"))
     )
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
