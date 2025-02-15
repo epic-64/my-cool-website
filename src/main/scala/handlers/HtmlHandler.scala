@@ -16,10 +16,10 @@ def renderHelloPage(name: String): String =
     )
   ).render
 
+extension (content: String)
+  def toUtf8Http: Route = complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, content))
+
 object HtmlHandler:
   def routes: Route = concat(
-    path("hello" / Segment) { name =>
-      val htmlResponse = renderHelloPage(name)
-      complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, htmlResponse))
-    }
+    path("hello" / Segment) { name => renderHelloPage(name).toUtf8Http },
   )
