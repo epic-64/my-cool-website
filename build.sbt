@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus"             %% "mockito-5-12"         % "3.2.19.0" % Test,
   "org.scalamock"                 %% "scalamock"            % "7.2.0"    % Test,
   "com.typesafe.play"             %% "twirl-api"            % "1.6.8",
+  "com.lihaoyi"                   %% "scalatags"            % "0.13.1",
 )
 
 coverageEnabled := true
