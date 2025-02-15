@@ -12,7 +12,8 @@ def renderHelloPage(name: String): String =
     body(
       h1(s"Hello, $name!"),
       p("Welcome to the site."),
-      button(attr("hx-get") := "/ping", attr("hx-swap") := "outerHTML")("Ping the server!")
+      button(attr("hx-get") := "/ping", attr("hx-swap") := "outerHTML")("Ping the server!"),
+      raw(s"""<div>my name is <span>$name</span></div>""")
     )
   ).render
 
