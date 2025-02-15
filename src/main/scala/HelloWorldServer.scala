@@ -24,7 +24,6 @@ given spray.json.RootJsonFormat[MultiplyRequest] = jsonFormat2(MultiplyRequest.a
 given spray.json.RootJsonFormat[MultiplyResult]  = jsonFormat3(MultiplyResult.apply)
 
 object HelloWorldServer {
-
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem                        = ActorSystem("my-actor-system")
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
@@ -33,7 +32,6 @@ object HelloWorldServer {
       pathSingleSlash {
         getFromResource("public/index.html")
       },
-
       path("hello")(complete("Hello, world!")),
       path("goodbye")(complete("Goodbye, world!")),
       path("ping")(complete("pong")),
@@ -51,13 +49,11 @@ object HelloWorldServer {
           }
         }
       },
-
       pathPrefix("assets") {
         respondWithHeader(RawHeader("Cache-Control", "public, max-age=86400")) {
           getFromResourceDirectory("public/assets") // Serve files
         }
       },
-
       path("404") {
         complete("<html><h1>404 - Not Found</h1></html>") // Simple HTML 404
       },
