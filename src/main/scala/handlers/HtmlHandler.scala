@@ -7,22 +7,23 @@ import scalatags.Text.all.{head => htmlHead, title => _, _}
 import scalatags.Text.tags2.title
 
 def layout(pageTitle: String)(content: Modifier*): String =
-  html(
-    htmlHead(
-      title(pageTitle),
-      meta(charset := "UTF-8"),
-      link(rel := "stylesheet", href := "/assets/style.css")
+  val theHead = htmlHead(
+    title(pageTitle),
+    meta(charset := "UTF-8"),
+    link(rel := "stylesheet", href := "/assets/style.css")
+  )
+
+  val theBody = body(
+    header(
+      h1("My Cool Website")
     ),
-    body(
-      header(
-        h1("My Cool Website")
-      ),
-      div(content), // Content provided by the route
-      footer(
-        p("© 2025 My Cool Website")
-      )
+    div(content), // Content provided by the route
+    footer(
+      p("© 2025 My Cool Website")
     )
-  ).render
+  )
+
+  html(theHead, theBody).render
 
 def renderHelloPage(name: String): String =
   layout(s"Hello $name")(
