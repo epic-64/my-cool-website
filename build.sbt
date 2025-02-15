@@ -2,6 +2,7 @@ ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
 
 lazy val root = (project in file("."))
+  .enablePlugins(SbtTwirl)
   .settings(
     name := "MyCoolWebsite"
   )
@@ -15,6 +16,7 @@ libraryDependencies ++= Seq(
   "org.scalatest"                 %% "scalatest"            % "3.2.19"   % Test,
   "org.scalatestplus"             %% "mockito-5-12"         % "3.2.19.0" % Test,
   "org.scalamock"                 %% "scalamock"            % "7.2.0"    % Test,
+  "com.typesafe.play"             %% "twirl-api"            % "1.6.8",
 )
 
 coverageEnabled := true
