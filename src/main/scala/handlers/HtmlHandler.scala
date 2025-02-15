@@ -14,7 +14,9 @@ def layout(pageTitle: String)(content: Modifier*): String =
       link(rel := "stylesheet", href := "/assets/style.css")
     ),
     body(
-      h1("My Cool Website"),
+      header(
+        h1("My Cool Website")
+      ),
       div(content), // Content provided by the route
       footer(
         p("© 2025 My Cool Website")
