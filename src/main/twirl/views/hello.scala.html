@@ -1,4 +1,4 @@
-@(name: String)
+@(name: String, cssVersion: Long)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,7 +6,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Hello @name!</title>
-        <link rel="stylesheet" href="/assets/css/style.css">
+        <link rel="stylesheet" href="/assets/css/style.css?v=@cssVersion">
         <script src="/assets/js/htmx.2.0.0.min.js"></script>
     </head>
     <body>
