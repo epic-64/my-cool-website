@@ -2,10 +2,11 @@ ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
 
 lazy val root = (project in file("."))
-  .enablePlugins(SbtTwirl)
   .settings(
     name := "MyCoolWebsite"
   )
+
+enablePlugins(RevolverPlugin)
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka"             %% "akka-http"            % "10.5.3",

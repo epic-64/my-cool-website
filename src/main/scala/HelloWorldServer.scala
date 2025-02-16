@@ -1,7 +1,8 @@
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import scala.concurrent.ExecutionContextExecutor
-import scala.io.StdIn
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContextExecutor}
 
 object HelloWorldServer:
   def main(args: Array[String]): Unit =
@@ -12,7 +13,9 @@ object HelloWorldServer:
 
     println("Server running at http://localhost:8080/")
     println("Press RETURN to stop...")
-    StdIn.readLine()
+
+    Await.result(bindingFuture.flatMap(_.whenTerminated), Duration.Inf)
+    // StdIn.readLine()
 
     bindingFuture
       .flatMap(_.unbind())

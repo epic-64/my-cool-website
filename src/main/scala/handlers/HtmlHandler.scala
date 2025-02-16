@@ -10,7 +10,7 @@ def layout(pageTitle: String)(content: Modifier*): String =
   val theHead = htmlHead(
     title(pageTitle),
     meta(charset := "UTF-8"),
-    link(rel := "stylesheet", href := "/assets/style.css"),
+    link(rel := "stylesheet", href := "/public/assets/css/style.css"),
     script(src := "https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js")
   )
 
