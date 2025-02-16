@@ -10,13 +10,6 @@ object HelloWorldServer:
     implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
     val bindingFuture = Http().newServerAt("localhost", 8080).bind(Routes.allRoutes)
-
     println("Server running at http://localhost:8080/")
-    println("Press RETURN to stop...")
 
     Await.result(bindingFuture.flatMap(_.whenTerminated), Duration.Inf)
-    // StdIn.readLine()
-
-    bindingFuture
-      .flatMap(_.unbind())
-      .onComplete(_ => system.terminate())
