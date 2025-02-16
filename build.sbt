@@ -1,4 +1,4 @@
-ThisBuild / name         := "my-cool-website"
+ThisBuild / name         := "mycoolwebsite"
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
 
