@@ -52,5 +52,5 @@ object HtmlHandler:
   def routes: Route = concat(
     path("hello" / Segment) { name => renderHelloPage(name).toUtf8Http },
     path("hello-twirl" / Segment) { name => renderHelloTwirl(name).toUtf8Http },
-    path("ping") { complete("Pong!") }
+    path("ping") { views.html.pong().toString.toUtf8Http }
   )
