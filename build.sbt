@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
 
 enablePlugins(SbtTwirl)
 enablePlugins(RevolverPlugin)
+enablePlugins(JavaAppPackaging)
 
 val PekkoVersion     = "1.1.3"
 val PekkoHttpVersion = "1.1.0"
