@@ -3,15 +3,16 @@ package handlers
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
-import scalatags.Text.all.{head => htmlHead, title => _, _}
+import scalatags.Text.all.{head as htmlHead, title as _, *}
 import scalatags.Text.tags2.title
 
 def layout(pageTitle: String)(content: Modifier*): String =
+
   val theHead = htmlHead(
     title(pageTitle),
     meta(charset := "UTF-8"),
     raw("""<meta name="viewport" content="width=device-width, initial-scale=1">"""),
-    link(rel := "stylesheet", href := "/public/assets/css/style.css"),
+    link(rel := "stylesheet", href := "/assets/css/style.css"),
     link(rel := "stylesheet", href := "https://unpkg.com/@tailwindcss/browser@4"),
     script(src := "https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js")
   )

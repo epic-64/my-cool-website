@@ -5,7 +5,7 @@ import handlers.{ApiHandler, HtmlHandler, StaticHandler}
 object Routes:
   def allRoutes: Route =
     concat(
+      StaticHandler.routes,
       HtmlHandler.routes,
       ApiHandler.routes,
-      StaticHandler.routes
     )
