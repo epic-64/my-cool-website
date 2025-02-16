@@ -1,29 +1,74 @@
-body {
-  font-family: sans-serif;
+/* General resets & base styles */
+* {
   margin: 0;
   padding: 0;
-  background-color: #f7f7f7;
-  color: #333;
+  box-sizing: border-box;
 }
 
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+/* Centered layout */
 .container {
   max-width: 800px;
-  margin: 40px auto;
-  padding: 20px;
-  background-color: white;
+  margin: 0 auto;
+  background: white;
+  padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
 }
 
+/* Headings */
+h1, h2, h3 {
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+p {
+  margin-bottom: 16px;
+}
+
+/* Buttons */
 button {
-  background-color: #007bff;
+  background-color: #3498db;
   color: white;
   padding: 10px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Links */
+a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+footer {
+  margin-top: 40px;
+  font-size: 0.9em;
+  color: #7f8c8d;
+  text-align: center;
 }

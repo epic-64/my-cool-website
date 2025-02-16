@@ -21,7 +21,7 @@ def layout(pageTitle: String)(content: Modifier*): String =
     header(
       h1("My Cool Website")
     ),
-    div(content), // Content provided by the route
+    div(cls := "container")(content), // Content provided by the route
     footer(
       p("© 2025 My Cool Website")
     )
