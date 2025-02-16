@@ -24,6 +24,6 @@ extension (content: String)
 
 object HtmlHandler:
   def routes: Route = concat(
-    path("hello-twirl" / Segment) { name => renderHelloTwirl(name).toUtf8Http },
+    path("hello" / Segment) { name => renderHelloTwirl(name).toUtf8Http },
     path("ping") { renderPong.toUtf8Http }
   )

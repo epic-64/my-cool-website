@@ -1,28 +1,16 @@
 @(name: String, cssVersion: Long)
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Hello @name!</title>
-        <link rel="stylesheet" href="/assets/css/style.css?v=@cssVersion">
-        <script src="/assets/js/htmx.2.0.0.min.js"></script>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Hello, @name!</h1>
-            <p>Welcome to our awesome site powered by Scala & Twirl 🚀</p>
+@views.html.layout(s"Hello $name", cssVersion) {
+    <h1>Hello, @name!</h1>
+    <p>Welcome to our awesome site powered by Scala & Twirl 🚀</p>
 
-            <button hx-get="/ping" hx-target="#pong-container" hx-swap="beforeend">
-                Ping the server!
-            </button>
+    <button hx-get="/ping" hx-target="#pong-container" hx-swap="beforeend">
+        Ping the server!
+    </button>
 
-            <div id="pong-container" class="pong-container">
-                    <!-- New Pongs will be added here -->
-            </div>
-        </div>
-    </body>
+    <div id="pong-container" class="pong-container">
+            <!-- New Pongs will be added here -->
+    </div>
 
     <script>
             document.body.addEventListener('htmx:afterSwap', function (evt) {
@@ -36,4 +24,4 @@
                 }
             });
     </script>
-</html>
+}
