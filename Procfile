@@ -1,1 +1,1 @@
-web: ./target/universal/stage/bin/my-cool-website
+web: ./target/universal/stage/bin/mycoolwebsite
