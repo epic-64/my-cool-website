@@ -1,5 +1,4 @@
 addSbtPlugin("org.jetbrains.scala" % "sbt-ide-settings"    % "1.1.2")  // forgot what this is for
-addSbtPlugin("com.eed3si9n"        % "sbt-assembly"        % "2.3.0")  // create a fat jar with sbt assembly command
 addSbtPlugin("org.scoverage"       % "sbt-scoverage"       % "2.2.2")  // code coverage
 addSbtPlugin("com.typesafe.play"   % "sbt-twirl"           % "1.6.8")  // compile twirl templates
 addSbtPlugin("io.spray"            % "sbt-revolver"        % "0.9.1")  // forgot what this is for
