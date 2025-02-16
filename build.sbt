@@ -1,16 +1,13 @@
+ThisBuild / name         := "my-cool-website"
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
-
-Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resources"
-
-lazy val root = (project in file("."))
-  .settings(
-    name := "my-cool-website"
-  )
 
 enablePlugins(SbtTwirl)
 enablePlugins(RevolverPlugin)
 enablePlugins(JavaAppPackaging)
+
+Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resources"
+coverageEnabled := sys.env.get("ENABLE_COVERAGE").contains("true")
 
 val PekkoVersion     = "1.1.3"
 val PekkoHttpVersion = "1.1.0"
@@ -28,5 +25,3 @@ libraryDependencies ++= Seq(
   "com.typesafe.play"             %% "twirl-api"             % "1.6.8",
   "com.lihaoyi"                   %% "scalatags"             % "0.13.1",
 )
-
-coverageEnabled := true
