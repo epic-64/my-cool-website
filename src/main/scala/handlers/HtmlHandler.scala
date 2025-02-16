@@ -43,11 +43,14 @@ def renderHelloPage(name: String): String =
     )
   )
 
+def renderHelloTwirl(name: String): String = views.html.hello(name).toString
+
 extension (content: String)
   def toUtf8Http: Route = complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, content))
 
 object HtmlHandler:
   def routes: Route = concat(
     path("hello" / Segment) { name => renderHelloPage(name).toUtf8Http },
+    path("hello-twirl" / Segment) { name => renderHelloTwirl(name).toUtf8Http },
     path("ping") { complete("Pong!") }
   )

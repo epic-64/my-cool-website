@@ -8,6 +8,7 @@ lazy val root = (project in file("."))
     name := "MyCoolWebsite"
   )
 
+enablePlugins(SbtTwirl)
 enablePlugins(RevolverPlugin)
 
 libraryDependencies ++= Seq(
