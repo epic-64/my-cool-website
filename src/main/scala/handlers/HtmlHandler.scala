@@ -6,13 +6,12 @@ import akka.http.scaladsl.server.Route
 
 import java.nio.file.{Files, Paths}
 
-def cssVersionTimestamp: Long =
-  val path = Paths.get("src/main/resources/public/assets/css/style.css")
-  Files.getLastModifiedTime(path).toMillis
+def getFrontendVersion: Long =
+  val folders = List("src/main/resources/public/assets/css", "src/main/resources/public/assets/js")
+  folders.map(folder => Paths.get(folder).toFile.listFiles.map(_.lastModified).max).max
 
 def renderHelloTwirl(name: String): String =
-  def cssVersion = cssVersionTimestamp
-  views.html.hello(name, cssVersion).toString
+  views.html.hello(name, getFrontendVersion).toString
 
 def renderPong: String =
   val emojis = List("🏓", "🏸", "🏒", "🏏", "🏑", "🏹", "🎣", "🥊", "🥋", "🥅", "🎯")
