@@ -13,5 +13,4 @@ object HelloWorldServer:
     val bindingFuture = Http().newServerAt("0.0.0.0", port).bind(Routes.allRoutes)
 
     println("Server running at http://localhost:8080/")
-
     Await.result(bindingFuture.flatMap(_.whenTerminated), Duration.Inf)

@@ -7,7 +7,9 @@ enablePlugins(RevolverPlugin)
 enablePlugins(JavaAppPackaging)
 
 Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resources"
-coverageEnabled := sys.env.get("ENABLE_COVERAGE").contains("true")
+coverageEnabled            := sys.env.get("ENABLE_COVERAGE").contains("true")
+assembly / mainClass       := Some("HelloWorldServer")
+assembly / assemblyJarName := "app.jar"
 
 val PekkoVersion     = "1.1.3"
 val PekkoHttpVersion = "1.1.0"
