@@ -5,9 +5,10 @@ import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
 
 object StaticHandler:
-  def routes: Route =
-    pathPrefix("assets") {
+  def routes: Route = concat(
+    pathPrefix("public/assets") {
       respondWithHeader(RawHeader("Cache-Control", "public, max-age=86400")) {
         getFromResourceDirectory("public/assets")
       }
-    }
+    },
+  )

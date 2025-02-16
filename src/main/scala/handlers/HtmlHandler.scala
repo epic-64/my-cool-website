@@ -10,7 +10,9 @@ def layout(pageTitle: String)(content: Modifier*): String =
   val theHead = htmlHead(
     title(pageTitle),
     meta(charset := "UTF-8"),
+    raw("""<meta name="viewport" content="width=device-width, initial-scale=1">"""),
     link(rel := "stylesheet", href := "/public/assets/css/style.css"),
+    link(rel := "stylesheet", href := "https://unpkg.com/@tailwindcss/browser@4"),
     script(src := "https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js")
   )
 
@@ -28,12 +30,15 @@ def layout(pageTitle: String)(content: Modifier*): String =
 
 def renderHelloPage(name: String): String =
   layout(s"Hello $name")(
-    h2(s"Hello, $name!"),
-    p("Welcome to our website."),
-    button(
-      attr("hx-get") := "/ping",
-      attr("hx-swap") := "outerHTML"
-    )("Ping the server!")
+    div(cls := "max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-4")(
+      h2(cls := "text-2xl font-bold text-gray-800")(s"Hello, $name!"),
+      p(cls := "text-gray-600")("Welcome to our website."),
+      button(
+        cls := "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded",
+        attr("hx-get") := "/ping",
+        attr("hx-swap") := "outerHTML"
+      )("Ping the server!!")
+    )
   )
 
 extension (content: String)

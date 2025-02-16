@@ -1,6 +1,8 @@
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
 
+Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resources"
+
 lazy val root = (project in file("."))
   .settings(
     name := "MyCoolWebsite"

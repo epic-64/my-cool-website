@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "browsersync": "browser-sync start --proxy 'localhost:8080' --files 'target/scala-*/classes/**/*.class' --debounce 1000"
+  }
+}
