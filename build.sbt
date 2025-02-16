@@ -10,6 +10,7 @@ Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resourc
 coverageEnabled            := sys.env.get("ENABLE_COVERAGE").contains("true")
 assembly / mainClass       := Some("HelloWorldServer")
 assembly / assemblyJarName := "app.jar"
+executableScriptName       := "main" // required by nixpacks
 
 val PekkoVersion     = "1.1.3"
 val PekkoHttpVersion = "1.1.0"
