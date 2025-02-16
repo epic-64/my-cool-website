@@ -1,10 +1,10 @@
 package handlers
 
-import akka.http.scaladsl.server.Directives.*
-import akka.http.scaladsl.server.Route
+import org.apache.pekko.http.scaladsl.server.Directives.*
+import org.apache.pekko.http.scaladsl.server.Route
 import models.*
 import models.MathModels.given
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import spray.json.*
 
 object ApiHandler:

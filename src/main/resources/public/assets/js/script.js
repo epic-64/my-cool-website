@@ -1,3 +1,3 @@
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Akka HTTP is serving this JS file!");
+    console.log("Pekko HTTP is serving this JS file!");
 });
