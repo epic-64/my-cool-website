@@ -4,17 +4,18 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.Paths
 
 def getFrontendVersion: Long = {
-  val folders = List("src/main/resources/public/assets/css", "src/main/resources/public/assets/js")
-
   def getLastModified(folder: java.io.File): Long =
     val files = folder.listFiles
     if files == null || files.isEmpty then 0L
     else files.map(file => if file.isDirectory then getLastModified(file) else file.lastModified).max
 
-  folders.map(folder => getLastModified(Paths.get(folder).toFile)).max
+  List(
+    "src/main/resources/public/assets/css",
+    "src/main/resources/public/assets/js"
+  ).map(folder => getLastModified(Paths.get(folder).toFile)).max
 }
 
 def renderHelloTwirl(name: String): String =
