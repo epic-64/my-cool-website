@@ -23,4 +23,17 @@
             </div>
         </div>
     </body>
+
+    <script>
+            document.body.addEventListener('htmx:afterSwap', function (evt) {
+                const pongContainer = document.getElementById('pong-container');
+
+                if (evt.target === pongContainer) {
+                    const maxItems = 6;
+                    if (pongContainer.children.length > maxItems) {
+                        pongContainer.removeChild(pongContainer.firstElementChild);
+                    }
+                }
+            });
+    </script>
 </html>
