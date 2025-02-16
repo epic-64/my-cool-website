@@ -4,6 +4,10 @@
 
 [Source Code](https://github.com/epic-64/my-cool-website)
 
+## Auto recompile on file change
+- open new terminal
+- `sbt ~reStart`
+
 ## Set the correct git user for the project
 ```
 git config user.name "github username"
