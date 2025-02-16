@@ -5,7 +5,7 @@ Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resourc
 
 lazy val root = (project in file("."))
   .settings(
-    name := "MyCoolWebsite"
+    name := "my-cool-website"
   )
 
 enablePlugins(SbtTwirl)
