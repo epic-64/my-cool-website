@@ -1,5 +1,6 @@
 package handlers
 
+import com.typesafe.config.ConfigFactory
 import org.apache.pekko.http.scaladsl.model.headers.HttpCookie
 import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
 import org.apache.pekko.http.scaladsl.server.Directives.*
@@ -10,13 +11,18 @@ import java.nio.file.{Files, Paths, StandardOpenOption}
 import scala.collection.concurrent.TrieMap
 import scala.util.{Random, Try}
 
+val config = ConfigFactory.load()
+
 case class UserCounter(counter: Int)
 
 object UserCounter:
   given ReadWriter[UserCounter] = macroRW
 
-object UserCounterStorage {
-  private def userFilePath(userId: String) = Paths.get(s"data/user_$userId.json")
+object UserCounterStorage:
+  private val config  = ConfigFactory.load()
+  private val baseDir = Paths.get(config.getString("storage.userDataPath"))
+
+  private def userFilePath(userId: String) = baseDir.resolve(s"user_$userId.json")
 
   def readCounter(userId: String): UserCounter =
     val path = userFilePath(userId)
@@ -34,7 +40,6 @@ object UserCounterStorage {
       StandardOpenOption.CREATE,
       StandardOpenOption.TRUNCATE_EXISTING
     )
-}
 
 def withUserSession(innerRoute: String => Route): Route =
   optionalCookie("userId") {

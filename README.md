@@ -8,6 +8,11 @@
 - open new terminal
 - `sbt ~reStart`
 
+## Run performance test
+```bash
+ab -n 10000 -c 10 http://localhost:8080/hello/yourname
+```
+
 ## Set the correct git user for the project
 ```
 git config user.name "github username"
