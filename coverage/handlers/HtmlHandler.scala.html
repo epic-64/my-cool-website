@@ -1,0 +1,1326 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          handlers/HtmlHandler.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package handlers
+</span>2 <span style=''>
+</span>3 <span style=''>import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
+</span>4 <span style=''>import org.apache.pekko.http.scaladsl.server.Directives.*
+</span>5 <span style=''>import org.apache.pekko.http.scaladsl.server.Route
+</span>6 <span style=''>
+</span>7 <span style=''>import java.nio.file.Paths
+</span>8 <span style=''>
+</span>9 <span style=''></span><span style='background: #F0ADAD'>def getFrontendVersion</span><span style=''>: Long = {
+</span>10 <span style=''>  </span><span style='background: #F0ADAD'>def getLastModified</span><span style=''>(folder: java.io.File): Long =
+</span>11 <span style=''>    val files = </span><span style='background: #F0ADAD'>folder.listFiles</span><span style=''>
+</span>12 <span style=''>    if files == null || </span><span style='background: #F0ADAD'>files.isEmpty</span><span style=''> then </span><span style='background: #F0ADAD'>0L</span><span style=''>
+</span>13 <span style=''>    else </span><span style='background: #F0ADAD'>files.map(file =&gt; if file.isDirectory then getLastModified(file) else file.lastModified).max</span><span style=''>
+</span>14 <span style=''>
+</span>15 <span style=''>  </span><span style='background: #F0ADAD'>List(
+</span>16 <span style=''></span><span style='background: #F0ADAD'>    &quot;src/main/resources/public/assets/css&quot;,
+</span>17 <span style=''></span><span style='background: #F0ADAD'>    &quot;src/main/resources/public/assets/js&quot;
+</span>18 <span style=''></span><span style='background: #F0ADAD'>  ).map(folder =&gt; getLastModified(Paths.get(folder).toFile)).max</span><span style=''>
+</span>19 <span style=''>}
+</span>20 <span style=''>
+</span>21 <span style=''></span><span style='background: #F0ADAD'>def renderHelloTwirl</span><span style=''>(name: String): String =
+</span>22 <span style=''>  </span><span style='background: #F0ADAD'>views.html.hello(name, getFrontendVersion).toString</span><span style=''>
+</span>23 <span style=''>
+</span>24 <span style=''></span><span style='background: #F0ADAD'>def renderPong</span><span style=''>: String =
+</span>25 <span style=''>  val emojis = </span><span style='background: #F0ADAD'>List(&quot;🏓&quot;, &quot;🏸&quot;, &quot;🏒&quot;, &quot;🏏&quot;, &quot;🏑&quot;, &quot;🏹&quot;, &quot;🎣&quot;, &quot;🥊&quot;, &quot;🥋&quot;, &quot;🥅&quot;, &quot;🎯&quot;)</span><span style=''>
+</span>26 <span style=''>  val randomEmoji = </span><span style='background: #F0ADAD'>emojis(scala.util.Random.nextInt(emojis.length))</span><span style=''>
+</span>27 <span style=''>  </span><span style='background: #F0ADAD'>views.html.pong(randomEmoji).toString</span><span style=''>
+</span>28 <span style=''>
+</span>29 <span style=''>extension (content: String)
+</span>30 <span style=''>  </span><span style='background: #F0ADAD'>def toUtf8Http</span><span style=''>: Route = </span><span style='background: #F0ADAD'>complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, content))</span><span style=''>
+</span>31 <span style=''>
+</span>32 <span style=''>object HtmlHandler:
+</span>33 <span style=''>  </span><span style='background: #F0ADAD'>def routes</span><span style=''>: Route = </span><span style='background: #F0ADAD'>concat(
+</span>34 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;hello&quot; / Segment) { name =&gt; renderHelloTwirl(name).toUtf8Http },
+</span>35 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;ping&quot;) { renderPong.toUtf8Http }
+</span>36 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          76
+        </td>
+        <td>
+          227
+          -
+          249
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          getFrontendVersion
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def getFrontendVersion
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          69
+        </td>
+        <td>
+          262
+          -
+          281
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          getLastModified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def getLastModified
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          55
+        </td>
+        <td>
+          328
+          -
+          344
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          listFiles
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          folder.listFiles
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          56
+        </td>
+        <td>
+          369
+          -
+          374
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          refArrayOps
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          58
+        </td>
+        <td>
+          388
+          -
+          390
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          0L
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          57
+        </td>
+        <td>
+          369
+          -
+          382
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          isEmpty
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files.isEmpty
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          59
+        </td>
+        <td>
+          400
+          -
+          492
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          max
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files.map(file =&gt; if file.isDirectory then getLastModified(file) else file.lastModified).max
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          68
+        </td>
+        <td>
+          400
+          -
+          492
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          max
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files.map(file =&gt; if file.isDirectory then getLastModified(file) else file.lastModified).max
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          62
+        </td>
+        <td>
+          400
+          -
+          405
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          refArrayOps
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          65
+        </td>
+        <td>
+          443
+          -
+          464
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getLastModified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getLastModified(file)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          64
+        </td>
+        <td>
+          443
+          -
+          464
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getLastModified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getLastModified(file)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          67
+        </td>
+        <td>
+          470
+          -
+          487
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          lastModified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.lastModified
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          61
+        </td>
+        <td>
+          400
+          -
+          488
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files.map(file =&gt; if file.isDirectory then getLastModified(file) else file.lastModified)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          60
+        </td>
+        <td>
+          400
+          -
+          488
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          wrapLongArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          files.map(file =&gt; if file.isDirectory then getLastModified(file) else file.lastModified)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          63
+        </td>
+        <td>
+          421
+          -
+          437
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          isDirectory
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.isDirectory
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          66
+        </td>
+        <td>
+          470
+          -
+          487
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          lastModified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.lastModified
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          70
+        </td>
+        <td>
+          496
+          -
+          652
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          max
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List(\n    &quot;src/main/resources/public/assets/css&quot;,\n    &quot;src/main/resources/public/assets/js&quot;\n  ).map(folder =&gt; getLastModified(Paths.get(folder).toFile)).max
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          72
+        </td>
+        <td>
+          496
+          -
+          591
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List(\n    &quot;src/main/resources/public/assets/css&quot;,\n    &quot;src/main/resources/public/assets/js&quot;\n  )
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          71
+        </td>
+        <td>
+          496
+          -
+          648
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List(\n    &quot;src/main/resources/public/assets/css&quot;,\n    &quot;src/main/resources/public/assets/js&quot;\n  ).map(folder =&gt; getLastModified(Paths.get(folder).toFile))
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          74
+        </td>
+        <td>
+          622
+          -
+          646
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toFile
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Paths.get(folder).toFile
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          73
+        </td>
+        <td>
+          606
+          -
+          647
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getLastModified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getLastModified(Paths.get(folder).toFile)
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          75
+        </td>
+        <td>
+          622
+          -
+          639
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Paths.get(folder)
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          80
+        </td>
+        <td>
+          656
+          -
+          676
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          renderHelloTwirl
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def renderHelloTwirl
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          77
+        </td>
+        <td>
+          703
+          -
+          745
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.hello(name, getFrontendVersion)
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          79
+        </td>
+        <td>
+          703
+          -
+          754
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.hello(name, getFrontendVersion).toString
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          78
+        </td>
+        <td>
+          726
+          -
+          744
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          getFrontendVersion
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getFrontendVersion
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          87
+        </td>
+        <td>
+          756
+          -
+          770
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          renderPong
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def renderPong
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          81
+        </td>
+        <td>
+          796
+          -
+          866
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List(&quot;🏓&quot;, &quot;🏸&quot;, &quot;🏒&quot;, &quot;🏏&quot;, &quot;🏑&quot;, &quot;🏹&quot;, &quot;🎣&quot;, &quot;🥊&quot;, &quot;🥋&quot;, &quot;🥅&quot;, &quot;🎯&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          83
+        </td>
+        <td>
+          894
+          -
+          934
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          nextInt
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          scala.util.Random.nextInt(emojis.length)
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          82
+        </td>
+        <td>
+          887
+          -
+          935
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          emojis(scala.util.Random.nextInt(emojis.length))
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          84
+        </td>
+        <td>
+          920
+          -
+          933
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          emojis.length
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          86
+        </td>
+        <td>
+          938
+          -
+          975
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.pong(randomEmoji).toString
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          85
+        </td>
+        <td>
+          938
+          -
+          966
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.pong(randomEmoji)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          89
+        </td>
+        <td>
+          1040
+          -
+          1092
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpEntity(ContentTypes.`text/html(UTF-8)`, content)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          91
+        </td>
+        <td>
+          1007
+          -
+          1021
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          toUtf8Http
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def toUtf8Http
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          88
+        </td>
+        <td>
+          1031
+          -
+          1093
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          complete
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, content))
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          90
+        </td>
+        <td>
+          1040
+          -
+          1092
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpEntity(ContentTypes.`text/html(UTF-8)`, content)
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          40
+        </td>
+        <td>
+          1137
+          -
+          1266
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          concat
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          concat(\n    path(&quot;hello&quot; / Segment) { name =&gt; renderHelloTwirl(name).toUtf8Http },\n    path(&quot;ping&quot;) { renderPong.toUtf8Http }\n  )
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          54
+        </td>
+        <td>
+          1117
+          -
+          1127
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def routes
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          41
+        </td>
+        <td>
+          1149
+          -
+          1218
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;hello&quot; / Segment) { name =&gt; renderHelloTwirl(name).toUtf8Http }
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          44
+        </td>
+        <td>
+          1154
+          -
+          1171
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          /
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;hello&quot; / Segment
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          47
+        </td>
+        <td>
+          1183
+          -
+          1205
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          renderHelloTwirl
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderHelloTwirl(name)
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          46
+        </td>
+        <td>
+          1183
+          -
+          1216
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toUtf8Http
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderHelloTwirl(name).toUtf8Http
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          43
+        </td>
+        <td>
+          1149
+          -
+          1172
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;hello&quot; / Segment)
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          45
+        </td>
+        <td>
+          1154
+          -
+          1161
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;hello&quot;
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          42
+        </td>
+        <td>
+          1149
+          -
+          1172
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addDirectiveApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;hello&quot; / Segment)
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          50
+        </td>
+        <td>
+          1224
+          -
+          1236
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;ping&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          53
+        </td>
+        <td>
+          1239
+          -
+          1249
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          renderPong
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderPong
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          49
+        </td>
+        <td>
+          1224
+          -
+          1236
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;ping&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          52
+        </td>
+        <td>
+          1239
+          -
+          1260
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toUtf8Http
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderPong.toUtf8Http
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          48
+        </td>
+        <td>
+          1224
+          -
+          1262
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;ping&quot;) { renderPong.toUtf8Http }
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          51
+        </td>
+        <td>
+          1229
+          -
+          1235
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;ping&quot;
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

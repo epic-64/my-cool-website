@@ -1,0 +1,739 @@
+<scoverage 
+statement-count="174" statements-invoked="0" statement-rate="0.00" branch-rate="0.00" version="1.0" timestamp="1739816091579">
+    <packages>
+        <package name="&lt;empty&gt;" statement-count="17" statements-invoked="0" statement-rate="0.00">
+            <classes>
+                <class 
+                name="&lt;empty&gt;.HelloWorldServer" filename="HelloWorldServer.scala" statement-count="12" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="&lt;empty&gt;/HelloWorldServer/main" statement-count="11" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="572" end="639" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="214" end="222" line="8" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="450" end="510" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="493" end="509" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="450" end="456" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="515" end="566" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="407" end="424" line="10" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="585" end="624" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="450" end="487" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="493" end="509" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="main" start="314" end="344" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="&lt;empty&gt;/HelloWorldServer/$anonfun" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="&lt;empty&gt;" class="HelloWorldServer" class-type="Object" full-class-name="&lt;empty&gt;.HelloWorldServer" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/HelloWorldServer.scala" method="$anonfun" start="607" end="623" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+                <class 
+                name="&lt;empty&gt;.Routes" filename="Routes.scala" statement-count="5" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="&lt;empty&gt;/Routes/allRoutes" statement-count="5" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="&lt;empty&gt;" class="Routes" class-type="Object" full-class-name="&lt;empty&gt;.Routes" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/Routes.scala" method="allRoutes" start="253" end="271" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="Routes" class-type="Object" full-class-name="&lt;empty&gt;.Routes" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/Routes.scala" method="allRoutes" start="225" end="245" line="8" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="Routes" class-type="Object" full-class-name="&lt;empty&gt;.Routes" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/Routes.scala" method="allRoutes" start="184" end="197" line="6" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="Routes" class-type="Object" full-class-name="&lt;empty&gt;.Routes" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/Routes.scala" method="allRoutes" start="211" end="303" line="7" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="&lt;empty&gt;" class="Routes" class-type="Object" full-class-name="&lt;empty&gt;.Routes" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/Routes.scala" method="allRoutes" start="279" end="296" line="10" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+            </classes>
+        </package>
+        <package name="handlers" statement-count="91" statements-invoked="0" statement-rate="0.00">
+            <classes>
+                <class 
+                name="handlers.StaticHandler" filename="handlers/StaticHandler.scala" statement-count="16" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="handlers/StaticHandler/routes" statement-count="16" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="234" end="502" line="8" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="343" end="351" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="361" end="431" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="246" end="265" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="332" end="497" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="214" end="224" line="8" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="442" end="466" line="14" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="332" end="352" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="246" end="265" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="361" end="431" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="274" end="320" line="10" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="251" end="264" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="442" end="483" line="14" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="332" end="352" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="361" end="491" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="StaticHandler" class-type="Object" full-class-name="handlers.StaticHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/StaticHandler.scala" method="routes" start="246" end="326" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+                <class 
+                name="handlers.HtmlHandler$package" filename="handlers/HtmlHandler.scala" statement-count="37" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="handlers/HtmlHandler$package/renderHelloTwirl" statement-count="4" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderHelloTwirl" start="703" end="745" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderHelloTwirl" start="656" end="676" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderHelloTwirl" start="703" end="754" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderHelloTwirl" start="726" end="744" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/HtmlHandler$package/getFrontendVersion" statement-count="4" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getFrontendVersion" start="496" end="648" line="18" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getFrontendVersion" start="227" end="249" line="9" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getFrontendVersion" start="496" end="652" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getFrontendVersion" start="496" end="591" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/HtmlHandler$package/renderPong" statement-count="7" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="894" end="934" line="26" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="938" end="975" line="27" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="887" end="935" line="26" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="938" end="966" line="27" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="756" end="770" line="24" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="796" end="866" line="25" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="renderPong" start="920" end="933" line="26" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/HtmlHandler$package/toUtf8Http" statement-count="4" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="toUtf8Http" start="1040" end="1092" line="30" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="toUtf8Http" start="1007" end="1021" line="30" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="toUtf8Http" start="1031" end="1093" line="30" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="toUtf8Http" start="1040" end="1092" line="30" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/HtmlHandler$package/$anonfun" statement-count="8" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="622" end="646" line="18" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="443" end="464" line="13" branch="true" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="443" end="464" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="606" end="647" line="18" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="470" end="487" line="13" branch="true" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="421" end="437" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="622" end="639" line="18" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="470" end="487" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/HtmlHandler$package/getLastModified" statement-count="10" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="400" end="492" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="400" end="492" line="13" branch="true" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="400" end="405" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="369" end="374" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="328" end="344" line="11" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="388" end="390" line="12" branch="true" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="400" end="488" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="400" end="488" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="262" end="281" line="10" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler$package" class-type="Object" full-class-name="handlers.HtmlHandler$package" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="getLastModified" start="369" end="382" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+                <class 
+                name="handlers.ApiHandler" filename="handlers/ApiHandler.scala" statement-count="23" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="handlers/ApiHandler/routes" statement-count="19" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="332" end="337" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="450" end="454" line="16" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="465" end="492" line="17" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="315" end="643" line="11" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="425" end="639" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="430" end="440" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="327" end="362" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="332" end="349" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="450" end="454" line="16" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="465" end="492" line="17" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="425" end="441" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="327" end="362" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="425" end="441" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="472" end="491" line="17" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="327" end="419" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="332" end="361" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="450" end="633" line="16" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="295" end="305" line="11" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="routes" start="465" end="625" line="17" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/ApiHandler/$anonfun" statement-count="4" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="$anonfun" start="608" end="614" line="19" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="$anonfun" start="390" end="412" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="$anonfun" start="599" end="615" line="19" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="ApiHandler" class-type="Object" full-class-name="handlers.ApiHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/ApiHandler.scala" method="$anonfun" start="381" end="413" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+                <class 
+                name="handlers.HtmlHandler" filename="handlers/HtmlHandler.scala" statement-count="15" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="handlers/HtmlHandler/routes" statement-count="13" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1224" end="1236" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1149" end="1218" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1239" end="1249" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1154" end="1171" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1137" end="1266" line="33" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1224" end="1236" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1149" end="1172" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1239" end="1260" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1154" end="1161" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1117" end="1127" line="33" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1224" end="1262" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1149" end="1172" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="routes" start="1229" end="1235" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="handlers/HtmlHandler/$anonfun" statement-count="2" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="1183" end="1205" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="handlers" class="HtmlHandler" class-type="Object" full-class-name="handlers.HtmlHandler" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/handlers/HtmlHandler.scala" method="$anonfun" start="1183" end="1216" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+            </classes>
+        </package>
+        <package name="models" statement-count="3" statements-invoked="0" statement-rate="0.00">
+            <classes>
+                <class 
+                name="models.MathModels" filename="models/MathModels.scala" statement-count="3" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="models/MathModels/&lt;init&gt;" statement-count="3" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="models" class="MathModels" class-type="Object" full-class-name="models.MathModels" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/models/MathModels.scala" method="&lt;init&gt;" start="446" end="479" line="13" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="models" class="MathModels" class-type="Object" full-class-name="models.MathModels" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/models/MathModels.scala" method="&lt;init&gt;" start="369" end="403" line="12" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="models" class="MathModels" class-type="Object" full-class-name="models.MathModels" source="/home/runner/work/my-cool-website/my-cool-website/src/main/scala/models/MathModels.scala" method="&lt;init&gt;" start="298" end="326" line="11" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+            </classes>
+        </package>
+        <package name="views.html" statement-count="63" statements-invoked="0" statement-rate="0.00">
+            <classes>
+                <class 
+                name="views.html.layout" filename="views/html/layout.template.scala" statement-count="17" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="views.html/layout/render" statement-count="2" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="render" start="1422" end="1432" line="40" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="render" start="1521" end="1558" line="40" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/layout/ref" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="ref" start="1717" end="1724" line="44" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/layout/$anonfun" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="$anonfun" start="1676" end="1713" line="42" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/layout/apply" statement-count="12" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="745" end="771" line="20" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="599" end="608" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="992" end="1088" line="26" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="1124" end="1281" line="27" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="736" end="1400" line="20" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="1347" end="1399" line="33" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="967" end="991" line="26" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="772" end="966" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="1089" end="1123" line="27" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="714" end="1414" line="16" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="1310" end="1346" line="32" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="apply" start="1282" end="1309" line="32" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method name="views.html/layout/f" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="layout" class-type="Object" full-class-name="views.html.layout" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/layout.template.scala" method="f" start="1562" end="1567" line="42" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+                        </method>
+                    </methods>
+</class>
+                <class 
+                name="views.html.hello" filename="views/html/hello.template.scala" statement-count="33" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method 
+                        name="views.html/hello/render" statement-count="2" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="render" start="2202" end="2212" line="50" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="render" start="2282" end="2304" line="50" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/hello/apply" statement-count="28" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="2131" end="2175" line="43" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1654" end="1767" line="38" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="843" end="874" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1850" end="1957" line="40" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="936" end="1357" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="718" end="744" line="20" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="2032" end="2060" line="42" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1432" end="1575" line="35" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="787" end="801" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1387" end="1431" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1987" end="2031" line="41" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="762" end="2178" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1605" end="1653" line="37" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="834" end="2176" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="2102" end="2130" line="43" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1797" end="1849" line="39" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="912" end="935" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="709" end="2180" line="20" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1768" end="1796" line="39" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="593" end="602" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="875" end="911" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1958" end="1986" line="41" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1358" end="1386" line="34" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="745" end="2179" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="1576" end="1604" line="37" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="2061" end="2101" line="42" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="824" end="2177" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="apply" start="687" end="2194" line="16" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/hello/ref" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="ref" start="2419" end="2426" line="54" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/hello/$anonfun" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="$anonfun" start="2393" end="2415" line="52" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method name="views.html/hello/f" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="hello" class-type="Object" full-class-name="views.html.hello" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/hello.template.scala" method="f" start="2308" end="2313" line="52" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+                        </method>
+                    </methods>
+</class>
+                <class 
+                name="views.html.pong" filename="views/html/pong.template.scala" statement-count="13" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                    <methods>
+                        <method name="views.html/pong/ref" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="ref" start="1056" end="1063" line="33" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+                        </method>
+                        <method 
+                        name="views.html/pong/$anonfun" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="$anonfun" start="1040" end="1052" line="31" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method 
+                        name="views.html/pong/render" statement-count="2" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="render" start="954" end="966" line="29" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="render" start="889" end="899" line="29" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                        <method name="views.html/pong/f" statement-count="1" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="f" start="970" end="975" line="31" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+                        </method>
+                        <method 
+                        name="views.html/pong/apply" statement-count="8" statements-invoked="0" statement-rate="0.00" branch-rate="0.00">
+                            <statements>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="722" end="774" line="21" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="827" end="866" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="799" end="826" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="695" end="721" line="20" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="775" end="798" line="22" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="587" end="596" line="15" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="686" end="867" line="20" branch="false" invocation-count="0" ignored="false">
+</statement>
+                                <statement 
+                                package="views.html" class="pong" class-type="Object" full-class-name="views.html.pong" source="/home/runner/work/my-cool-website/my-cool-website/target/scala-3.6.3/twirl/main/views/html/pong.template.scala" method="apply" start="664" end="881" line="16" branch="false" invocation-count="0" ignored="false">
+</statement>
+                            </statements>
+</method>
+                    </methods>
+</class>
+            </classes>
+        </package>
+    </packages>
+</scoverage>

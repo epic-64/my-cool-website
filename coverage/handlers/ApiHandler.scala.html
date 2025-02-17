@@ -1,0 +1,617 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          handlers/ApiHandler.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package handlers
+</span>2 <span style=''>
+</span>3 <span style=''>import org.apache.pekko.http.scaladsl.server.Directives.*
+</span>4 <span style=''>import org.apache.pekko.http.scaladsl.server.Route
+</span>5 <span style=''>import models.*
+</span>6 <span style=''>import models.MathModels.given
+</span>7 <span style=''>import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
+</span>8 <span style=''>import spray.json.*
+</span>9 <span style=''>
+</span>10 <span style=''>object ApiHandler:
+</span>11 <span style=''>  </span><span style='background: #F0ADAD'>def routes</span><span style=''>: Route = </span><span style='background: #F0ADAD'>concat(
+</span>12 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;add&quot; / IntNumber / IntNumber) { (x, y) =&gt;
+</span>13 <span style=''></span><span style='background: #F0ADAD'>      complete(SumResult(x, y, x + y))
+</span>14 <span style=''></span><span style='background: #F0ADAD'>    },
+</span>15 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;multiply&quot;) {
+</span>16 <span style=''></span><span style='background: #F0ADAD'>      post {
+</span>17 <span style=''></span><span style='background: #F0ADAD'>        entity(as[MultiplyRequest]) { request =&gt;
+</span>18 <span style=''></span><span style='background: #F0ADAD'>          val result = MultiplyResult(request.x, request.y, request.x * request.y)
+</span>19 <span style=''></span><span style='background: #F0ADAD'>          complete(result)
+</span>20 <span style=''></span><span style='background: #F0ADAD'>        }
+</span>21 <span style=''></span><span style='background: #F0ADAD'>      }
+</span>22 <span style=''></span><span style='background: #F0ADAD'>    }
+</span>23 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          17
+        </td>
+        <td>
+          315
+          -
+          643
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          concat
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          concat(\n    path(&quot;add&quot; / IntNumber / IntNumber) { (x, y) =&gt;\n      complete(SumResult(x, y, x + y))\n    },\n    path(&quot;multiply&quot;) {\n      post {\n        entity(as[MultiplyRequest]) { request =&gt;\n          val result = MultiplyResult(request.x, request.y, request.x * request.y)\n          complete(result)\n        }\n      }\n    }\n  )
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          39
+        </td>
+        <td>
+          295
+          -
+          305
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def routes
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          23
+        </td>
+        <td>
+          332
+          -
+          337
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;add&quot;
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          20
+        </td>
+        <td>
+          327
+          -
+          362
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;add&quot; / IntNumber / IntNumber)
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          22
+        </td>
+        <td>
+          332
+          -
+          349
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          /
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;add&quot; / IntNumber
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          19
+        </td>
+        <td>
+          327
+          -
+          362
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addDirectiveApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;add&quot; / IntNumber / IntNumber)
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          18
+        </td>
+        <td>
+          327
+          -
+          419
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;add&quot; / IntNumber / IntNumber) { (x, y) =&gt;\n      complete(SumResult(x, y, x + y))\n    }
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          21
+        </td>
+        <td>
+          332
+          -
+          361
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          /
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;add&quot; / IntNumber / IntNumber
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          25
+        </td>
+        <td>
+          390
+          -
+          412
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          SumResult(x, y, x + y)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          24
+        </td>
+        <td>
+          381
+          -
+          413
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          complete
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          complete(SumResult(x, y, x + y))
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          26
+        </td>
+        <td>
+          425
+          -
+          639
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;multiply&quot;) {\n      post {\n        entity(as[MultiplyRequest]) { request =&gt;\n          val result = MultiplyResult(request.x, request.y, request.x * request.y)\n          complete(result)\n        }\n      }\n    }
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          29
+        </td>
+        <td>
+          430
+          -
+          440
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;multiply&quot;
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          28
+        </td>
+        <td>
+          425
+          -
+          441
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;multiply&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          27
+        </td>
+        <td>
+          425
+          -
+          441
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;multiply&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          32
+        </td>
+        <td>
+          450
+          -
+          454
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          post
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          post
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          31
+        </td>
+        <td>
+          450
+          -
+          454
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          post
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          30
+        </td>
+        <td>
+          450
+          -
+          633
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          post {\n        entity(as[MultiplyRequest]) { request =&gt;\n          val result = MultiplyResult(request.x, request.y, request.x * request.y)\n          complete(result)\n        }\n      }
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          35
+        </td>
+        <td>
+          465
+          -
+          492
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          entity
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          entity(as[MultiplyRequest])
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          34
+        </td>
+        <td>
+          465
+          -
+          492
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addDirectiveApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          entity(as[MultiplyRequest])
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          36
+        </td>
+        <td>
+          472
+          -
+          491
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          as
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          as[MultiplyRequest]
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          33
+        </td>
+        <td>
+          465
+          -
+          625
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          entity(as[MultiplyRequest]) { request =&gt;\n          val result = MultiplyResult(request.x, request.y, request.x * request.y)\n          complete(result)\n        }
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          38
+        </td>
+        <td>
+          608
+          -
+          614
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          result
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          37
+        </td>
+        <td>
+          599
+          -
+          615
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          complete
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          complete(result)
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

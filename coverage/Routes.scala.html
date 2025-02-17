@@ -1,0 +1,173 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          Routes.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>import org.apache.pekko.http.scaladsl.server.Directives.*
+</span>2 <span style=''>import org.apache.pekko.http.scaladsl.server.Route
+</span>3 <span style=''>import handlers.{ApiHandler, HtmlHandler, StaticHandler}
+</span>4 <span style=''>
+</span>5 <span style=''>object Routes:
+</span>6 <span style=''>  </span><span style='background: #F0ADAD'>def allRoutes</span><span style=''>: Route =
+</span>7 <span style=''>    </span><span style='background: #F0ADAD'>concat(
+</span>8 <span style=''></span><span style='background: #F0ADAD'>      StaticHandler.routes,
+</span>9 <span style=''></span><span style='background: #F0ADAD'>      HtmlHandler.routes,
+</span>10 <span style=''></span><span style='background: #F0ADAD'>      ApiHandler.routes,
+</span>11 <span style=''></span><span style='background: #F0ADAD'>    )</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          6
+        </td>
+        <td>
+          16
+        </td>
+        <td>
+          184
+          -
+          197
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allRoutes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def allRoutes
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          12
+        </td>
+        <td>
+          211
+          -
+          303
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          concat
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          concat(\n      StaticHandler.routes,\n      HtmlHandler.routes,\n      ApiHandler.routes,\n    )
+        </td>
+      </tr><tr>
+        <td>
+          8
+        </td>
+        <td>
+          13
+        </td>
+        <td>
+          225
+          -
+          245
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          StaticHandler.routes
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          14
+        </td>
+        <td>
+          253
+          -
+          271
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HtmlHandler.routes
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          15
+        </td>
+        <td>
+          279
+          -
+          296
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ApiHandler.routes
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>
