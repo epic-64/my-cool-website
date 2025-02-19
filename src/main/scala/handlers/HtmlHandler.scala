@@ -8,10 +8,7 @@ import org.apache.pekko.http.scaladsl.server.Route
 import upickle.default.*
 
 import java.nio.file.{Files, Paths, StandardOpenOption}
-import scala.collection.concurrent.TrieMap
 import scala.util.{Random, Try}
-
-val config = ConfigFactory.load()
 
 case class UserCounter(counter: Int)
 
@@ -41,18 +38,17 @@ object UserCounterStorage:
       StandardOpenOption.TRUNCATE_EXISTING
     )
 
-def withUserSession(innerRoute: String => Route): Route =
-  optionalCookie("userId") {
-    case Some(cookie) =>
-      // User already has a session
-      innerRoute(cookie.value)
+def withUserSession(innerRoute: String => Route): Route = {
+  val cookieName = "userId"
+
+  optionalCookie(cookieName) {
+    case Some(cookie) => innerRoute(cookie.value)
     case None         =>
-      // New user → Generate a session ID
-      val userId = Random.alphanumeric.take(12).mkString
-      setCookie(HttpCookie("userId", value = userId, path = Some("/"))) {
-        innerRoute(userId)
-      }
+      val newUserId = Random.alphanumeric.take(12).mkString
+      val cookie    = HttpCookie(cookieName, value = newUserId, path = Some("/"))
+      setCookie(cookie)(innerRoute(newUserId))
   }
+}
 
 def getFrontendVersion: Long = {
   def getLastModified(folder: java.io.File): Long =
@@ -68,8 +64,6 @@ def getFrontendVersion: Long = {
 
 def renderHelloTwirl(name: String): String =
   views.html.hello(name, getFrontendVersion).toString
-
-val userCounters = TrieMap[String, Int]()
 
 def renderPong(userId: String): String = {
   val emojis = List(
