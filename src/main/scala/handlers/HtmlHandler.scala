@@ -50,17 +50,7 @@ def withUserSession(innerRoute: String => Route): Route = {
   }
 }
 
-def getFrontendVersion: Long = {
-  def getLastModified(folder: java.io.File): Long =
-    val files = folder.listFiles
-    if files == null || files.isEmpty then 0L
-    else files.map(file => if file.isDirectory then getLastModified(file) else file.lastModified).max
-
-  List(
-    "src/main/resources/public/assets/css",
-    "src/main/resources/public/assets/js"
-  ).map(folder => getLastModified(Paths.get(folder).toFile)).max
-}
+def getFrontendVersion: Long = 0L
 
 def renderHelloTwirl(name: String): String =
   views.html.hello(name, getFrontendVersion).toString
@@ -79,7 +69,6 @@ def renderPong(userId: String): String = {
 
   val current   = UserCounterStorage.readCounter(userId)
   val nextIndex = (current.counter + 1) % emojis.size
-
   UserCounterStorage.writeCounter(userId, UserCounter(nextIndex))
 
   val (emoji, color) = emojis(current.counter)
