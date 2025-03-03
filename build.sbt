@@ -1,6 +1,7 @@
 ThisBuild / name         := "mycoolwebsite"
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
+ThisBuild / javacOptions ++= Seq("--release", "21")
 
 enablePlugins(SbtTwirl)
 enablePlugins(RevolverPlugin)
@@ -9,6 +10,17 @@ enablePlugins(JavaAppPackaging)
 Compile / resourceDirectories += baseDirectory.value / "src" / "main" / "resources"
 coverageEnabled      := sys.env.get("ENABLE_COVERAGE").contains("true")
 executableScriptName := "main" // required by nixpacks
+
+reStart / javaOptions ++= Seq(
+  "-Xmx1024M",
+  "-Xms64M",
+  "-XX:SoftMaxHeapSize=128M",
+  "-XX:MaxMetaspaceSize=64M",
+  "-XX:+UseZGC",
+  "-XX:+ZGenerational",
+  "-XX:+ZUncommit",
+  // "-XX:ZUncommitDelay=1",
+)
 
 val PekkoVersion     = "1.1.3"
 val PekkoHttpVersion = "1.1.0"

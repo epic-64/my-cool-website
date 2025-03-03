@@ -79,6 +79,7 @@ extension (content: String) def toUtf8Http: Route = complete(HttpEntity(ContentT
 
 object HtmlHandler:
   def routes: Route = concat(
+    path("fastping")(complete("Pong")),
     path("hello" / Segment)(name => renderHelloTwirl(name).toUtf8Http),
     path("ping")(withUserSession(userId => renderPong(userId).toUtf8Http))
   )
