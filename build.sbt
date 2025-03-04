@@ -1,7 +1,7 @@
 ThisBuild / name         := "mycoolwebsite"
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.6.3"
-ThisBuild / javacOptions ++= Seq("--release", "21")
+// ThisBuild / javacOptions ++= Seq("--release", "21")
 
 enablePlugins(SbtTwirl)
 enablePlugins(RevolverPlugin)
