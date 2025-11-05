@@ -1,13 +1,12 @@
 package playground
 
-import java.net.http.{HttpClient, HttpRequest, HttpResponse}
-import java.net.URI
-import scala.util.{Failure, Success, Try}
-import scala.util.control.NonFatal
 import upickle.default.*
 import upickle.implicits.key
 
-import scala.util.chaining.scalaUtilChainingOps // for @key annotations
+import java.net.URI
+import java.net.http.{HttpClient, HttpRequest, HttpResponse}
+import scala.util.chaining.scalaUtilChainingOps
+import scala.util.{Failure, Success, Try}
 
 // Domain models with friendly field names mapped to Open-Meteo JSON keys
 case class CurrentWeather(
@@ -15,7 +14,9 @@ case class CurrentWeather(
     @key("windspeed")     windSpeedKmh: Double,
     @key("winddirection") windDirectionDeg: Double,
 )
-case class WeatherResponse(@key("current_weather") currentWeather: CurrentWeather)
+case class WeatherResponse(
+    @key("current_weather") currentWeather: CurrentWeather
+)
 
 object WeatherResponse:
   given ReadWriter[CurrentWeather] = macroRW
