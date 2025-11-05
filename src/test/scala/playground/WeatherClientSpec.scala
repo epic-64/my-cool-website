@@ -57,7 +57,21 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
     )) { (client, logger) =>
       client.get(0, 0) shouldBe List("We had an error parsing the response. Please try again later.")
       logger.errorMessages should have size 1
-      logger.errorMessages.head.startsWith("Parse failure:") shouldBe true
+
+      val msg = logger.errorMessages.head.toLowerCase
+      msg.startsWith("parse failure:") shouldBe true
+      msg.contains("temperature") shouldBe true
+    }
+
+    "ignore unexpected fields in response" in withStub(Success(
+      """{"current_weather":{"temperature":1.0,"windspeed":5.0,"winddirection":90.0,"extra":1}}"""
+    )) { (client, logger) =>
+      client.get(0, 0) shouldBe List(
+        "Current temperature: 1.0 C",
+        "Wind speed: 5.0 km/h",
+        "Wind direction: 90.0 degrees"
+      )
+      logger.errorMessages shouldBe Nil
     }
   }
 }
