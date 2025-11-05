@@ -34,7 +34,7 @@ class WeatherClient(httpClient: HttpClient = HttpClient.newHttpClient()):
       case Success(resp) if resp.statusCode() / 100 != 2 => List(s"ERROR: HTTP ${resp.statusCode()}")
       case Success(resp) => Try(read[WeatherResponse](resp.body())) match
         case Failure(parseErr) => List(s"ERROR: Parse failure: ${parseErr.getMessage}")
-        case Success(model) => model.currentWeather.pipe{ weather => List(
+        case Success(model) => model.currentWeather pipe { weather => List(
             f"Current temperature: ${weather.temperatureC}%.1f C",
             f"Wind speed: ${weather.windSpeedKmh}%.1f km/h",
             s"Wind direction: ${weather.windDirectionDeg} degrees"
