@@ -10,12 +10,8 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
   private def withStub(stub: Try[String])(body: (WeatherClient, MemoryLogger) => Any): Unit = {
     given WeatherHttp with
       def fetch(latitude: Double, longitude: Double): Try[String] = stub
-
-    val logger = MemoryLogger()
-    given Logger = logger
-
-    val client = WeatherClient()
-    body(client, logger)
+    given logger: MemoryLogger = new MemoryLogger()
+    body(WeatherClient(), logger)
   }
 
   "WeatherClient" should {
