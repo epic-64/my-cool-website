@@ -11,7 +11,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       given WeatherHttp with
         def fetch(latitude: Double, longitude: Double): Try[String] =
           Success("""{"current_weather":{"temperature":1.0,"windspeed":5.0,"winddirection":90.0}}""")
-      val logger = MemoryLogger(); given Logger = logger
+
+      val logger = MemoryLogger();
+      given Logger = logger
 
       val result = WeatherClient().get(52.52, 13.41)
 
@@ -26,7 +28,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
     "return an error message when fetch fails" in {
       given WeatherHttp with
         def fetch(latitude: Double, longitude: Double): Try[String] = Failure(new RuntimeException("Oops"))
-      val logger = MemoryLogger(); given Logger = logger
+
+      val logger = MemoryLogger();
+      given Logger = logger
 
       val result = WeatherClient().get(0, 0)
 
@@ -37,7 +41,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
     "return a parse error message when JSON cannot be parsed" in {
       given WeatherHttp with
         def fetch(latitude: Double, longitude: Double): Try[String] = Success("{" )
-      val logger = MemoryLogger(); given Logger = logger
+
+      val logger = MemoryLogger();
+      given Logger = logger
 
       val result = WeatherClient().get(0, 0)
 
@@ -50,7 +56,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       given WeatherHttp with
         def fetch(latitude: Double, longitude: Double): Try[String] =
           Success("""{"current_weather":{"temperature":1.24,"windspeed":7.25,"winddirection":270.0}}""")
-      val logger = MemoryLogger(); given Logger = logger
+
+      val logger = MemoryLogger();
+      given Logger = logger
 
       val result = WeatherClient().get(1.234, 5.678)
 
@@ -66,7 +74,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       given WeatherHttp with
         def fetch(latitude: Double, longitude: Double): Try[String] =
           Success("""{"current_weather":{"temp":1.0,"windspeed":5.0,"winddirection":90.0}}""")
-      val logger = MemoryLogger(); given Logger = logger
+
+      val logger = MemoryLogger();
+      given Logger = logger
 
       val result = WeatherClient().get(0, 0)
 
