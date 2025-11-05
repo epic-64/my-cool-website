@@ -4,6 +4,7 @@ import org.apache.pekko.http.scaladsl.server.Directives.*
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContextExecutor}
+import scala.util.chaining.scalaUtilChainingOps
 
 object HelloWorldServer2:
   def run(args: Array[String]): Unit =

@@ -12,6 +12,11 @@ import spray.json.enrichAny
 
 object ApiHandler:
   def routes: Route = concat(
+    path("hello") {
+      get {
+        complete("Hello, World!")
+      }
+    },
     path("add-stream" / IntNumber / IntNumber) { (x, y) =>
       val result         = SumResult(x, y, x + y).toJson.compactPrint
       val responseStream = Source.single(ByteString(result))
