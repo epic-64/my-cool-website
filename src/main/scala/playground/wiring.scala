@@ -60,7 +60,7 @@ object ProdWiring:
 
 def runApp()(using client: WeatherClient, logger: Logger): Unit =
   logger.info("=== Live Weather ===")
-  client.get(52.52, 13.41).foreach(logger.info)
+  client.get(12.34, 56.78).foreach(logger.info)
 
 @main def main(): Unit =
   import ProdWiring.given
