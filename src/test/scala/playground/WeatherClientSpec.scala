@@ -6,7 +6,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import scala.util.{Failure, Success, Try}
 
 class WeatherClientSpec extends AnyWordSpec with Matchers {
-
   private def withStub(stub: Try[String])(body: (WeatherClient, MemoryLogger) => Any): Unit = {
     given WeatherHttp with
       def fetch(latitude: Double, longitude: Double): Try[String] = stub
@@ -26,13 +25,6 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       logger.errorMessages shouldBe Nil
     }
 
-    "return an error message when fetch fails" in withStub(
-      Failure(new RuntimeException("Oops"))
-    ) { (client, logger) => {
-      client.get(0, 0) shouldBe List("We had an error fetching the weather data. Please try again later.")
-      logger.errorMessages shouldBe List("RuntimeException: Oops")
-    }}
-
     "return a parse error message when JSON cannot be parsed" in withStub(
       Success("{")
     ) { (client, logger) =>
@@ -40,6 +32,13 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       logger.errorMessages should have size 1
       logger.errorMessages.head.startsWith("Parse failure:") shouldBe true
     }
+
+    "return an error message when fetch fails" in withStub(
+      Failure(new RuntimeException("Oops"))
+    ) { (client, logger) => {
+      client.get(0, 0) shouldBe List("We had an error fetching the weather data. Please try again later.")
+      logger.errorMessages shouldBe List("RuntimeException: Oops")
+    }}
 
     "round numeric values to one decimal place in formatting" in withStub(Success(
       """{"current_weather":{"temperature":1.24,"windspeed":7.25,"winddirection":270.0}}"""
