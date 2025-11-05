@@ -30,10 +30,12 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       logger.errorMessages shouldBe Nil
     }
 
-    "return an error message when fetch fails" in withStub(Failure(new RuntimeException("Oops"))) { (client, logger) =>
+    "return an error message when fetch fails" in withStub(
+      Failure(new RuntimeException("Oops"))
+    ) { (client, logger) => {
       client.get(0, 0) shouldBe List("We had an error fetching the weather data. Please try again later.")
       logger.errorMessages shouldBe List("RuntimeException: Oops")
-    }
+    }}
 
     "return a parse error message when JSON cannot be parsed" in withStub(Success("{")) { (client, logger) =>
       client.get(0, 0) shouldBe List("We had an error parsing the response. Please try again later.")
