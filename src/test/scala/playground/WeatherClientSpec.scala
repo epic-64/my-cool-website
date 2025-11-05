@@ -1,9 +1,9 @@
-// filepath: /home/william/IdeaProjects/my-cool-website/src/test/scala/WeatherClientSpec.scala
 package playground
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import scala.util.{Success, Failure, Try}
+import org.scalatest.wordspec.AnyWordSpec
+
+import scala.util.{Failure, Success, Try}
 
 class WeatherClientSpec extends AnyWordSpec with Matchers {
   "WeatherClient" should {
