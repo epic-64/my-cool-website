@@ -19,9 +19,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
   }
 
   "WeatherClient" should {
-    "return formatted weather data when fetch succeeds and JSON parses" in withStub(Success(
-      """{"current_weather":{"temperature":1.0,"windspeed":5.0,"winddirection":90.0}}"""
-    )) { (client, logger) =>
+    "return formatted weather data when fetch succeeds and JSON parses" in withStub(
+      Success("""{"current_weather":{"temperature":1.0,"windspeed":5.0,"winddirection":90.0}}""")
+    ) { (client, logger) =>
       client.get(0, 0) shouldBe List(
         "Current temperature: 1.0 C",
         "Wind speed: 5.0 km/h",
@@ -37,7 +37,9 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
       logger.errorMessages shouldBe List("RuntimeException: Oops")
     }}
 
-    "return a parse error message when JSON cannot be parsed" in withStub(Success("{")) { (client, logger) =>
+    "return a parse error message when JSON cannot be parsed" in withStub(
+      Success("{")
+    ) { (client, logger) =>
       client.get(0, 0) shouldBe List("We had an error parsing the response. Please try again later.")
       logger.errorMessages should have size 1
       logger.errorMessages.head.startsWith("Parse failure:") shouldBe true
