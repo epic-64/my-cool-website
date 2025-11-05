@@ -41,7 +41,7 @@ class WeatherClient(using http: WeatherHttp, logger: Logger):
         logger.error(s"${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}")
         List(s"We had an error fetching the weather data. Please try again later.")
       case Success(fetchBody) =>
-        logger.info(s"Fetched weather data: $fetchBody")
+        logger.debug(s"Fetched weather data: $fetchBody")
         Try(read[WeatherResponse](fetchBody)) match
           case Failure(parseErr) =>
             logger.error(s"Parse failure: ${parseErr.getMessage}")
