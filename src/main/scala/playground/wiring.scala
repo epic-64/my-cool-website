@@ -40,15 +40,17 @@ class WeatherClient(using http: WeatherHttp, logger: Logger):
       case Failure(fetchErr) =>
         logger.error(s"${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}")
         List(s"We had an error fetching the weather data. Please try again later.")
-      case Success(body) => Try(read[WeatherResponse](body)) match
-        case Failure(parseErr) =>
-          logger.error(s"Parse failure: ${parseErr.getMessage}")
-          List(s"We had an error parsing the response. Please try again later.")
-        case Success(model) => model.currentWeather pipe { weather => List(
-            f"Current temperature: ${weather.temperatureC}%.1f C",
-            f"Wind speed: ${weather.windSpeedKmh}%.1f km/h",
-            s"Wind direction: ${weather.windDirectionDeg} degrees"
-          ) }
+      case Success(fetchBody) =>
+        Try(read[WeatherResponse](fetchBody)) match
+          case Failure(parseErr) =>
+            logger.error(s"Parse failure: ${parseErr.getMessage}")
+            List(s"We had an error parsing the response. Please try again later.")
+          case Success(parsed) =>
+            parsed.currentWeather pipe { weather => List(
+              f"Current temperature: ${weather.temperatureC}%.1f C",
+              f"Wind speed: ${weather.windSpeedKmh}%.1f km/h",
+              s"Wind direction: ${weather.windDirectionDeg} degrees"
+            ) }
 
 object ProdWiring:
   given HttpClient = HttpClient.newHttpClient()
