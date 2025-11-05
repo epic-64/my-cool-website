@@ -37,9 +37,13 @@ class LiveWeatherHttp(using httpClient: HttpClient) extends WeatherHttp:
 class WeatherClient(using http: WeatherHttp):
   def get(latitude: Double, longitude: Double): List[String] =
     http.fetch(latitude, longitude) match
-      case Failure(e) => List(s"ERROR: ${e.getClass.getSimpleName}: ${e.getMessage}")
+      case Failure(fetchErr) =>
+        println(s"ERROR: ${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}")
+        List(s"We had an error fetching the weather data. Please try again later.")
       case Success(body) => Try(read[WeatherResponse](body)) match
-        case Failure(parseErr) => List(s"ERROR: Parse failure: ${parseErr.getMessage}")
+        case Failure(parseErr) =>
+          println(s"ERROR: Parse failure: ${parseErr.getMessage}")
+          List(s"We had an error parsing the response. Please try again later.")
         case Success(model) => model.currentWeather pipe { weather => List(
             f"Current temperature: ${weather.temperatureC}%.1f C",
             f"Wind speed: ${weather.windSpeedKmh}%.1f km/h",
@@ -57,11 +61,10 @@ def runApp()(using client: WeatherClient): Unit =
 
 def runTest(): Unit =
   val stubJson = """{"current_weather":{"temperature":1.0,"windspeed":5.0,"winddirection":90.0}}"""
-  given WeatherHttp = (latitude: Double, longitude: Double) => Success(stubJson)
-  given WeatherClient = WeatherClient()
+  val client = WeatherClient(using http = (latitude: Double, longitude: Double) => Success(stubJson))
 
   println("=== Test Weather Data (Stubbed WeatherHttp) ===")
-  val result = summon[WeatherClient].get(0, 0)
+  val result = client.get(latitude = 0, longitude = 0)
   result.foreach(println)
 
   val expected = List(
@@ -71,7 +74,19 @@ def runTest(): Unit =
   )
   assert(result == expected, s"Expected $expected but got $result")
 
+def runTest2(): Unit =
+  given WeatherHttp = (latitude: Double, longitude: Double) => Failure(new RuntimeException("Test error"))
+  val client = WeatherClient()
+
+  println("=== Test Weather Data (Stubbed WeatherHttp) ===")
+  val result = client.get(latitude = 0, longitude = 0)
+  result.foreach(println)
+
+  val expected = List("We had an error fetching the weather data. Please try again later.")
+  assert(result == expected, s"Expected $expected but got $result")
+
 @main def main(): Unit =
   import ProdWiring.given
   runApp()
   runTest()
+  runTest2()
