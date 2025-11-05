@@ -26,11 +26,12 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
     }
 
     "return a parse error message when JSON cannot be parsed" in withStub(
-      Success("{")
+      Success("{not-json")
     ) { (client, logger) =>
-      client.get(0, 0) shouldBe List("We had an error parsing the response. Please try again later.")
+      client.get(0, 0) shouldBe List("We had an error parsing the weather data. Please try again later.")
       logger.errorMessages should have size 1
       logger.errorMessages.head.startsWith("Parse failure:") shouldBe true
+      logger.errorMessages.head.contains("{not-json") shouldBe true
     }
 
     "return an error message when fetch fails" in withStub(
@@ -54,7 +55,7 @@ class WeatherClientSpec extends AnyWordSpec with Matchers {
     "log error message when response does not contain temperature" in withStub(Success(
       """{"current_weather":{"temp":1.0,"windspeed":5.0,"winddirection":90.0}}"""
     )) { (client, logger) =>
-      client.get(0, 0) shouldBe List("We had an error parsing the response. Please try again later.")
+      client.get(0, 0) shouldBe List("We had an error parsing the weather data. Please try again later.")
       logger.errorMessages should have size 1
 
       val msg = logger.errorMessages.head.toLowerCase

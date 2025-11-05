@@ -44,8 +44,8 @@ class WeatherClient(using http: WeatherHttp, logger: Logger):
         logger.debug(s"Fetched weather data: $fetchBody")
         Try(read[WeatherResponse](fetchBody)) match
           case Failure(parseErr) =>
-            logger.error(s"Parse failure: ${parseErr.getMessage}")
-            List(s"We had an error parsing the response. Please try again later.")
+            logger.error(s"Parse failure: ${parseErr.getMessage} when parsing: $fetchBody")
+            List(s"We had an error parsing the weather data. Please try again later.")
           case Success(parsed) =>
             parsed.currentWeather pipe { weather => List(
               f"Current temperature: ${weather.temperatureC}%.1f C",
