@@ -4,3 +4,4 @@
 /target/
 /.bsp/sbt.json
 /data/
+/contract_state.json
