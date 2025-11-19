@@ -93,6 +93,17 @@ def context[A](info: String)(block: => Try[A]): Try[A] =
   block.recoverWith:
     case e => Failure(new Exception(s"$info: ${e.getMessage}", e))
 
+def example22(): Unit =
+  Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
+    .flatMap { c => context("Failed to save contract")(c.save()) }
+    .flatMap { c => context("Failed to sign by Party1")(c.signByParty1()) }
+    .flatMap { c => context("Failed to sign by Party2")(c.signByParty2()) }
+    .flatMap { c => context("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!")).map(_ => c) }
+    .flatMap { c => context("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!")).map(_ => c) }
+  match
+    case Failure(e) => println(s"Operation failed: ${e.getMessage}")
+    case Success(c) => println("Contract process completed successfully.")
+
 def example3(): Unit =
   (for
     c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
@@ -120,5 +131,6 @@ def example4(): Unit =
 @main def main(): Unit =
   example1()
   example2()
+  example22()
   example3()
   example4()
