@@ -5,13 +5,16 @@ import upickle.default.{read, write}
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
+import java.nio.file.Files
 import scala.util.chaining.scalaUtilChainingOps
 import scala.util.{Failure, Success, Try}
 
 extension (file: File)
-  def writeText(text: String): Unit =
-    java.nio.file.Files.writeString(file.toPath, text)
+  def writeText(text: String): Try[Unit] = Try:
+    Files.writeString(file.toPath, text, StandardCharsets.UTF_8)
+
+  def readText(): Try[String] = Try:
+    Files.readString(file.toPath, StandardCharsets.UTF_8)
 
 object ContractPersistence:
   def filePath(id: String) = s"data/contract_state_$id.json"
@@ -25,8 +28,8 @@ object ContractPersistence:
       file.writeText(json)
 
   def load(id: String): Try[StatefulContractDto] = Try:
-    val jsonStr = new String(Files.readAllBytes(Paths.get(filePath(id))), StandardCharsets.UTF_8)
-    read[StatefulContractDto](jsonStr)
+    val json = File(filePath(id)).readText().get
+    read[StatefulContractDto](json)
 
 def example1(): Unit =
   val contract = Contract("ABC123", "Alice", "Bob").toStatefulContract
