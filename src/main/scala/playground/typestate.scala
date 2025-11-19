@@ -6,7 +6,6 @@ import upickle.default.{read, write}
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
-import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
 object ContractPersistence {
@@ -28,28 +27,43 @@ object ContractBusiness:
 
 @main def main(): Unit =
   val contract = ContractBusiness.initialize("ABC123", "Alice", "Bob")
-  val saved = contract.save()
 
-  if saved.isFailure then
-    println(s"Failed to save contract: ${saved.failed.get.getMessage}")
-    return
+  val saved = try {
+    contract.save().get
+  } catch { case e: Exception =>
+      println(s"Failed to save contract: ${e.getMessage}")
+      return
+  }
 
-  val signed1 = contract.signByParty1()
-  if signed1.isFailure then
-    println(s"Failed to sign by Party1: ${signed1.failed.get.getMessage}")
-    return
+  val signed1 = try {
+    contract.signByParty1().get
+  } catch { case e: Exception =>
+      println(s"Failed to sign by Party1: ${e.getMessage}")
+      return
+  }
 
-  val signed2 = signed1.get.signByParty2()
-  if signed2.isFailure then
-    println(s"Failed to sign by Party2: ${signed2.failed.get.getMessage}")
-    return
+  val signed2 = try {
+    signed1.signByParty2().get
+  } catch { case e: Exception =>
+      println(s"Failed to sign by Party2: ${e.getMessage}")
+      return
+  }
 
-  val email1 = signed2.get.sendEmail(signed2.get.party1, "Contract signed!")
-  if email1.isFailure then
-    println(s"Failed to send email to Party1: ${email1.failed.get.getMessage}")
-    return
+  try {
+    signed2.sendEmail(signed2.party1, "Contract signed!").get
+  } catch { case e: Exception =>
+      println(s"Failed to send email to Party1: ${e.getMessage}")
+      return
+  }
 
-  
+  try {
+    signed2.sendEmail(signed2.party2, "Contract signed!").get
+  } catch { case e: Exception =>
+      println(s"Failed to send email to Party2: ${e.getMessage}")
+      return
+  }
+
+  println("Contract process completed successfully.")
 
   Contract("ABC123", "Alice", "Bob").toStatefulContract.save() match
     case Failure(err) => println(s"Failed to save contract: ${err.getMessage}");
@@ -71,7 +85,7 @@ object ContractBusiness:
     c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
     c <- errContext("Failed to save contract")(c.save())
     c <- errContext("Failed to sign by Party1")(c.signByParty1())
-    c <- errContext("Failed to sign by Party2")(c.signByParty2())
+    c <- errContext("Failed to sign by Party2")(c.signByParty1())
     _ <- errContext("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!"))
     _ <- errContext("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!"))
   yield c) match
