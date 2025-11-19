@@ -1,7 +1,7 @@
 package playground
 
 import models.ContractModelRW.*
-import models.{SignatureStatus, StatefulContract}
+import models.{SignatureStatus, StatefulContract, StatefulContractDto}
 import upickle.default.{read, write}
 
 import java.nio.charset.StandardCharsets
@@ -11,17 +11,19 @@ import scala.util.{Failure, Success, Try}
 object ContractPersistence {
   val filePath = "contract_state.json"
 
-  def save(contract: StatefulContract): Try[Unit] = Try:
-    val json = write(contract, indent = 2)
+  def save(contract: StatefulContract[? <: ContractState]): Try[Unit] = Try:
+    val dto = StatefulContractDto(contract.id, contract.party1, contract.party2, contract.party1Signature, contract.party2Signature, contract.state)
+    val json = write(dto, indent = 2)
     Files.write(Paths.get(filePath), json.getBytes(StandardCharsets.UTF_8))
 
-  def load(): Try[StatefulContract] = Try:
+  def load(): Try[StatefulContract[? <: ContractState]] = Try:
     val jsonStr = new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8)
-    read[StatefulContract](jsonStr)
+    val dto = read[StatefulContractDto](jsonStr)
+    dto.toTyped
 }
 
 object ContractBusiness:
-  def initialize(id: String, party1: String, party2: String): StatefulContract =
+  def initialize(id: String, party1: String, party2: String): StatefulContract[ContractState.Unsigned.type] =
     val unsigned = SignatureStatus(signed = false, timestamp = None)
     StatefulContract(id, party1, party2, unsigned, unsigned, ContractState.Unsigned)
 
@@ -82,7 +84,7 @@ object ContractBusiness:
       case e => Failure(new Exception(s"$operation: ${e.getMessage}", e))
 
   (for
-    c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
+    c <- errContext("Failed to initialize contract")(Success(ContractBusiness.initialize("ABC123", "Alice", "Bob")))
     c <- errContext("Failed to save contract")(c.save())
     c <- errContext("Failed to sign by Party1")(c.signByParty1())
     c <- errContext("Failed to sign by Party2")(c.signByParty1())
