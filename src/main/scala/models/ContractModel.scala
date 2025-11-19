@@ -24,28 +24,18 @@ case class StatefulContract[S <: ContractState](
     println(s"Sending email to $recipient: $message")
 
   def signByParty1()(using ev: S =:= ContractState.Unsigned.type): Try[StatefulContract[ContractState.Party1Signed.type]] =
-    val updated = StatefulContract[ContractState.Party1Signed.type](
-      id = id,
-      party1 = party1,
-      party2 = party2,
+    val updated = this.copy(
       party1Signature = SignatureStatus(true, Some(Instant.now)),
-      party2Signature = party2Signature,
       state = ContractState.Party1Signed
-    )
+    ).asInstanceOf[StatefulContract[ContractState.Party1Signed.type]]
     updated.save()
 
   def signByParty2()(using ev: S =:= ContractState.Party1Signed.type): Try[StatefulContract[ContractState.FullySigned.type]] =
-    val updated = StatefulContract[ContractState.FullySigned.type](
-      id = id,
-      party1 = party1,
-      party2 = party2,
-      party1Signature = party1Signature,
+    val updated = this.copy(
       party2Signature = SignatureStatus(true, Some(Instant.now)),
       state = ContractState.FullySigned
-    )
+    ).asInstanceOf[StatefulContract[ContractState.FullySigned.type]]
     updated.save()
-
-
 
 object StatefulContract:
   private def fromContract[S <: ContractState](contract: Contract[S], party1Sig: SignatureStatus, party2Sig: SignatureStatus, state: S): StatefulContract[S] =
