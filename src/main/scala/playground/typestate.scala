@@ -4,19 +4,28 @@ import ContractModelRW.*
 import upickle.default.{read, write}
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
+import java.io.File
+import scala.util.chaining.scalaUtilChainingOps
 import scala.util.{Failure, Success, Try}
 
+extension (file: File)
+  def writeText(text: String): Unit =
+    java.nio.file.Files.writeString(file.toPath, text)
+
 object ContractPersistence:
-  val filePath = "contract_state.json"
+  def filePath(id: String) = s"data/contract_state_$id.json"
 
   def save(contract: StatefulContract[? <: ContractState]): Try[Unit] = Try:
     val dto = StatefulContractDto(contract.id, contract.party1, contract.party2, contract.party1Signature, contract.party2Signature, contract.state)
-    val json = write(dto, indent = 2)
-    Files.write(Paths.get(filePath), json.getBytes(StandardCharsets.UTF_8))
+    val json = write(dto)
 
-  def load(): Try[StatefulContractDto] = Try:
-    val jsonStr = new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8)
+    File(filePath(contract.id)).tap: file =>
+      Option(file.getParentFile).foreach(_.mkdirs())
+      file.writeText(json)
+
+  def load(id: String): Try[StatefulContractDto] = Try:
+    val jsonStr = new String(Files.readAllBytes(Paths.get(filePath(id))), StandardCharsets.UTF_8)
     read[StatefulContractDto](jsonStr)
 
 def example1(): Unit =
@@ -95,7 +104,7 @@ def example3(): Unit =
 
 def example4(): Unit =
   (for
-    c <- context("Failed to load contract") { ContractPersistence.load() }
+    c <- context("Failed to load contract") { ContractPersistence.load("ABC123") }
     c <- context("Contract is not in unsigned State") { c.asUnsigned() }
     c <- context("Failed to sign by Party1") { c.signByParty1() }
     c <- context("Failed to sign by Party2") { c.signByParty2() }
