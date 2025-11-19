@@ -1,0 +1,18 @@
+{
+  "id": "ABC123",
+  "party1": "Alice",
+  "party2": "Bob",
+  "party1Signature": {
+    "signed": true,
+    "timestamp": [
+      "2025-11-20T12:19:33.144334301Z"
+    ]
+  },
+  "party2Signature": {
+    "signed": true,
+    "timestamp": [
+      "2025-11-20T12:19:33.152548117Z"
+    ]
+  },
+  "state": "FullySigned"
+}
