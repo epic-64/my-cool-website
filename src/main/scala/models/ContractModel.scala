@@ -21,6 +21,7 @@ case class StatefulContract(
   def load(): Try[StatefulContract] = playground.ContractPersistence.load()
 
   def sendEmail(recipient: String, message: String): Try[Unit] = Try:
+    throw new Exception("Not implemented")
     println(s"Sending email to $recipient: $message")
 
   def signByParty1(): Try[StatefulContract] =

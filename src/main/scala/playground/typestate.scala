@@ -38,3 +38,13 @@ object ContractBusiness:
           case Success(_) => c.sendEmail(c.party2, "Contract signed!") match
             case Failure(e) => println(s"Failed to send email: ${e.getMessage}");
             case Success(_) => println("Contract process completed successfully.")
+
+  (for
+    c <- Contract("ABC123", "Alice", "Bob").toStatefulContract.save()
+    c <- c.signByParty1()
+    c <- c.signByParty2()
+    _ <- c.sendEmail(c.party1, "Contract signed!")
+    _ <- c.sendEmail(c.party2, "Contract signed!")
+  yield c) match
+    case Failure(e) => println(s"Operation failed: ${e.getMessage}");
+    case Success(c) => println("Contract process completed successfully.")
