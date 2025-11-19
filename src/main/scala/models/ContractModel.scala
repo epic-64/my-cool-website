@@ -1,8 +1,10 @@
 package models
 
+import playground.ContractState.*
+
 import java.time.Instant
 import upickle.default.{ReadWriter, macroRW}
-import playground.{Contract, ContractState}
+import playground.{Contract, ContractPersistence, ContractState}
 
 import scala.util.Try
 
@@ -18,24 +20,24 @@ case class StatefulContract[S <: ContractState](
 ):
   def save(): Try[StatefulContract[S]] = playground.ContractPersistence.save(this).map(_ => this)
 
-  def load(): Try[StatefulContract[? <: ContractState]] = playground.ContractPersistence.load()
+  def load(): Try[StatefulContract[? <: ContractState]] = ContractPersistence.load()
 
-  def sendEmail(recipient: String, message: String)(using ev: S =:= ContractState.FullySigned.type): Try[Unit] = Try:
+  def sendEmail(recipient: String, message: String)(using ev: S =:= FullySigned.type): Try[Unit] = Try:
     println(s"Sending email to $recipient: $message")
 
-  def signByParty1()(using ev: S =:= ContractState.Unsigned.type): Try[StatefulContract[ContractState.Party1Signed.type]] =
-    val updated = this.copy(
-      party1Signature = SignatureStatus(true, Some(Instant.now)),
-      state = ContractState.Party1Signed
-    ).asInstanceOf[StatefulContract[ContractState.Party1Signed.type]]
-    updated.save()
+  def signByParty1()(using ev: S =:= Unsigned.type): Try[StatefulContract[Party1Signed.type]] = {
+    val sig = SignatureStatus(true, Some(Instant.now))
+    this.copy(party1Signature = sig, state = Party1Signed)
+      .asInstanceOf[StatefulContract[Party1Signed.type]]
+      .save()
+  }
 
-  def signByParty2()(using ev: S =:= ContractState.Party1Signed.type): Try[StatefulContract[ContractState.FullySigned.type]] =
-    val updated = this.copy(
-      party2Signature = SignatureStatus(true, Some(Instant.now)),
-      state = ContractState.FullySigned
-    ).asInstanceOf[StatefulContract[ContractState.FullySigned.type]]
-    updated.save()
+  def signByParty2()(using ev: S =:= Party1Signed.type): Try[StatefulContract[FullySigned.type]] = {
+    val sig = SignatureStatus(true, Some(Instant.now))
+    this.copy(party2Signature = sig, state = FullySigned)
+      .asInstanceOf[StatefulContract[FullySigned.type]]
+      .save()
+  }
 
 object StatefulContract:
   private def fromContract[S <: ContractState](contract: Contract[S], party1Sig: SignatureStatus, party2Sig: SignatureStatus, state: S): StatefulContract[S] =
@@ -43,9 +45,9 @@ object StatefulContract:
 
   def toContract(sc: StatefulContract[? <: ContractState]): Option[Contract[? <: ContractState]] =
     sc.state match
-      case ContractState.Unsigned => Some(Contract[ContractState.Unsigned.type](sc.id, sc.party1, sc.party2))
-      case ContractState.Party1Signed => Some(Contract[ContractState.Party1Signed.type](sc.id, sc.party1, sc.party2))
-      case ContractState.FullySigned => Some(Contract[ContractState.FullySigned.type](sc.id, sc.party1, sc.party2))
+      case Unsigned => Some(Contract[Unsigned.type](sc.id, sc.party1, sc.party2))
+      case Party1Signed => Some(Contract[Party1Signed.type](sc.id, sc.party1, sc.party2))
+      case FullySigned => Some(Contract[FullySigned.type](sc.id, sc.party1, sc.party2))
 
 // For serialization, we need an untyped version
 case class StatefulContractDto(
@@ -65,8 +67,7 @@ object ContractModelRW {
     Instant.parse
   )
   implicit val contractStateRW: ReadWriter[ContractState] = upickle.default.readwriter[String].bimap[ContractState](
-    _.toString,
-    s => playground.ContractState.valueOf(s)
+    _.toString, s => ContractState.valueOf(s)
   )
   implicit val signatureStatusRW: ReadWriter[SignatureStatus] = macroRW
   implicit val statefulContractDtoRW: ReadWriter[StatefulContractDto] = macroRW
