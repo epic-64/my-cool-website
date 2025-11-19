@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import scala.util.{Failure, Success, Try}
 
-object ContractPersistence {
+object ContractPersistence:
   val filePath = "contract_state.json"
 
   def save(contract: StatefulContract[? <: ContractState]): Try[Unit] = Try:
@@ -15,11 +15,9 @@ object ContractPersistence {
     val json = write(dto, indent = 2)
     Files.write(Paths.get(filePath), json.getBytes(StandardCharsets.UTF_8))
 
-  def load(): Try[StatefulContract[? <: ContractState]] = Try:
+  def load(): Try[StatefulContractDto] = Try:
     val jsonStr = new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8)
-    val dto = read[StatefulContractDto](jsonStr)
-    dto.toTyped
-}
+    read[StatefulContractDto](jsonStr)
 
 def example1(): Unit =
   val contract = Contract("ABC123", "Alice", "Bob").toStatefulContract
@@ -95,7 +93,20 @@ def example3(): Unit =
     case Failure(e) => println(s"Operation failed: ${e.getMessage}")
     case Success(c) => println("Contract process completed successfully.")
 
+def example4(): Unit =
+  (for
+    c <- recover("Failed to load contract") { ContractPersistence.load() }
+    c <- recover("Contract is not in unsigned State") { c.asUnsigned() }
+    c <- recover("Failed to sign by Party1") { c.signByParty1() }
+    c <- recover("Failed to sign by Party2") { c.signByParty2() }
+    _ <- recover("Failed to send email to Party1") { c.sendEmail(c.party1, "Contract signed!") }
+    _ <- recover("Failed to send email to Party2") { c.sendEmail(c.party2, "Contract signed!") }
+  yield (c)) match
+    case Failure(e) => println(s"Operation failed: ${e.getMessage}")
+    case Success(c) => println("Contract process completed successfully.")
+
 @main def main(): Unit =
   example1()
   example2()
   example3()
+  example4()

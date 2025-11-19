@@ -5,7 +5,7 @@ import playground.{Contract, ContractPersistence, ContractState}
 import upickle.default.{ReadWriter, macroRW}
 
 import java.time.Instant
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 case class StatefulContract[S <: ContractState](
   id: String,
@@ -16,8 +16,6 @@ case class StatefulContract[S <: ContractState](
   state: S
 ):
   def save(): Try[StatefulContract[S]] = playground.ContractPersistence.save(this).map(_ => this)
-
-  def load(): Try[StatefulContract[? <: ContractState]] = ContractPersistence.load()
 
   def sendEmail(recipient: String, message: String)(using ev: S =:= FullySigned.type): Try[Unit] = Try:
     println(s"Sending email to $recipient: $message")
@@ -51,13 +49,29 @@ case class StatefulContractDto(
   party2Signature: Option[Instant],
   state: ContractState
 ):
-  def toTyped: StatefulContract[? <: ContractState] =
-    StatefulContract(id, party1, party2, party1Signature, party2Signature, state)
+  def asUnsigned(): Try[StatefulContract[Unsigned.type]] = Try:
+    state match
+      case Unsigned => StatefulContract[Unsigned.type](id, party1, party2, party1Signature, party2Signature, Unsigned)
+      case _ => throw new Exception(s"Invalid state for Unsigned: $state")
+
+  def asParty1Signed(): Try[StatefulContract[Party1Signed.type]] = Try:
+    state match
+      case Party1Signed => StatefulContract[Party1Signed.type](id, party1, party2, party1Signature, party2Signature, Party1Signed)
+      case _ => throw new Exception(s"Invalid state for Party1Signed: $state")
+
+  def asFullySigned(): Try[StatefulContract[FullySigned.type]] = Try:
+    state match
+      case FullySigned => StatefulContract[FullySigned.type](id, party1, party2, party1Signature, party2Signature, FullySigned)
+      case _ => throw new Exception(s"Invalid state for FullySigned: $state")
+
+  def asTyped(): Try[StatefulContract[? <: ContractState]] = state match
+    case Unsigned => asUnsigned()
+    case Party1Signed => asParty1Signed()
+    case FullySigned => asFullySigned()
 
 object ContractModelRW:
   implicit val instantRW: ReadWriter[Instant] = upickle.default.readwriter[String].bimap[Instant](
-    _.toString,
-    Instant.parse
+    _.toString, Instant.parse
   )
   implicit val contractStateRW: ReadWriter[ContractState] = upickle.default.readwriter[String].bimap[ContractState](
     _.toString, s => ContractState.valueOf(s)
@@ -67,6 +81,6 @@ object ContractModelRW:
   implicit def statefulContractRW[S <: ContractState]: ReadWriter[StatefulContract[S]] =
     statefulContractDtoRW.bimap[StatefulContract[S]](
       sc => StatefulContractDto(sc.id, sc.party1, sc.party2, sc.party1Signature, sc.party2Signature, sc.state),
-      dto => dto.toTyped.asInstanceOf[StatefulContract[S]]
+      dto => dto.asTyped().asInstanceOf[StatefulContract[S]]
     )
 
