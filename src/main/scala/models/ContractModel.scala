@@ -24,35 +24,26 @@ case class StatefulContract[S <: ContractState](
     println(s"Sending email to $recipient: $message")
 
   def signByParty1()(using ev: S =:= ContractState.Unsigned.type): Try[StatefulContract[ContractState.Party1Signed.type]] =
-    // Create a temporary contract just to call the method
-    val tempContract = this.asInstanceOf[StatefulContract[ContractState.Unsigned.type]]
-    val unsignedEvidence: ContractState.Unsigned.type =:= ContractState.Unsigned.type = 
-      ev.asInstanceOf[ContractState.Unsigned.type =:= ContractState.Unsigned.type]
-    val contract = Contract[ContractState.Unsigned.type](id, party1, party2)
-    // Call with both () and using clause
-    val next = contract.signByParty1()(using unsignedEvidence)
-    val updated: StatefulContract[ContractState.Party1Signed.type] = StatefulContract.fromContract(
-      contract = next,
-      party1Sig = SignatureStatus(true, Some(Instant.now)),
-      party2Sig = party2Signature,
+    val updated = StatefulContract[ContractState.Party1Signed.type](
+      id = id,
+      party1 = party1,
+      party2 = party2,
+      party1Signature = SignatureStatus(true, Some(Instant.now)),
+      party2Signature = party2Signature,
       state = ContractState.Party1Signed
     )
-    Try:
-      updated.save().get
+    updated.save()
 
   def signByParty2()(using ev: S =:= ContractState.Party1Signed.type): Try[StatefulContract[ContractState.FullySigned.type]] =
-    val party1Evidence: ContractState.Party1Signed.type =:= ContractState.Party1Signed.type = 
-      ev.asInstanceOf[ContractState.Party1Signed.type =:= ContractState.Party1Signed.type]
-    val contract = Contract[ContractState.Party1Signed.type](id, party1, party2)
-    val next = contract.signByParty2()(using party1Evidence)
-    val updated: StatefulContract[ContractState.FullySigned.type] = StatefulContract.fromContract(
-      contract = next,
-      party1Sig = party1Signature,
-      party2Sig = SignatureStatus(true, Some(Instant.now)),
+    val updated = StatefulContract[ContractState.FullySigned.type](
+      id = id,
+      party1 = party1,
+      party2 = party2,
+      party1Signature = party1Signature,
+      party2Signature = SignatureStatus(true, Some(Instant.now)),
       state = ContractState.FullySigned
     )
-    Try:
-      updated.save().get
+    updated.save()
 
 
 

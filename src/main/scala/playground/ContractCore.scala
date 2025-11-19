@@ -15,3 +15,4 @@ case class Contract[S <: ContractState](id: String, party1: String, party2: Stri
 
   def toStatefulContract(using ev: S =:= Unsigned.type): StatefulContract[Unsigned.type] =
     StatefulContract(id, party1, party2, SignatureStatus(true, None), SignatureStatus(true, None), Unsigned)
+

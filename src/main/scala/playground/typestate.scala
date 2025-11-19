@@ -87,7 +87,7 @@ object ContractBusiness:
     c <- errContext("Failed to initialize contract")(Success(ContractBusiness.initialize("ABC123", "Alice", "Bob")))
     c <- errContext("Failed to save contract")(c.save())
     c <- errContext("Failed to sign by Party1")(c.signByParty1())
-    c <- errContext("Failed to sign by Party2")(c.signByParty1())
+    c <- errContext("Failed to sign by Party2")(c.signByParty2())
     _ <- errContext("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!"))
     _ <- errContext("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!"))
   yield c) match
