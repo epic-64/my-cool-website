@@ -27,6 +27,30 @@ object ContractBusiness:
     StatefulContract(id, party1, party2, unsigned, unsigned, ContractState.Unsigned)
 
 @main def main(): Unit =
+  val contract = ContractBusiness.initialize("ABC123", "Alice", "Bob")
+  val saved = contract.save()
+
+  if saved.isFailure then
+    println(s"Failed to save contract: ${saved.failed.get.getMessage}")
+    return
+
+  val signed1 = contract.signByParty1()
+  if signed1.isFailure then
+    println(s"Failed to sign by Party1: ${signed1.failed.get.getMessage}")
+    return
+
+  val signed2 = signed1.get.signByParty2()
+  if signed2.isFailure then
+    println(s"Failed to sign by Party2: ${signed2.failed.get.getMessage}")
+    return
+
+  val email1 = signed2.get.sendEmail(signed2.get.party1, "Contract signed!")
+  if email1.isFailure then
+    println(s"Failed to send email to Party1: ${email1.failed.get.getMessage}")
+    return
+
+  
+
   Contract("ABC123", "Alice", "Bob").toStatefulContract.save() match
     case Failure(err) => println(s"Failed to save contract: ${err.getMessage}");
     case Success(c) => c.signByParty1() match
