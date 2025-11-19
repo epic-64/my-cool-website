@@ -77,30 +77,30 @@ def example2(): Unit =
             case Failure(err) => println(s"Failed to send email: ${err.getMessage}");
             case Success(_) => println("Contract process completed successfully.")
 
-def recover[A](operation: String)(block: => Try[A]): Try[A] =
+def context[A](info: String)(block: => Try[A]): Try[A] =
   block.recoverWith:
-    case e => Failure(new Exception(s"$operation: ${e.getMessage}", e))
+    case e => Failure(new Exception(s"$info: ${e.getMessage}", e))
 
 def example3(): Unit =
   (for
     c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
-    c <- recover("Failed to save contract")(c.save())
-    c <- recover("Failed to sign by Party1")(c.signByParty1())
-    c <- recover("Failed to sign by Party2")(c.signByParty2())
-    _ <- recover("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!"))
-    _ <- recover("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!"))
+    c <- context("Failed to save contract")(c.save())
+    c <- context("Failed to sign by Party1")(c.signByParty1())
+    c <- context("Failed to sign by Party2")(c.signByParty2())
+    _ <- context("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!"))
+    _ <- context("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!"))
   yield c) match
     case Failure(e) => println(s"Operation failed: ${e.getMessage}")
     case Success(c) => println("Contract process completed successfully.")
 
 def example4(): Unit =
   (for
-    c <- recover("Failed to load contract") { ContractPersistence.load() }
-    c <- recover("Contract is not in unsigned State") { c.asUnsigned() }
-    c <- recover("Failed to sign by Party1") { c.signByParty1() }
-    c <- recover("Failed to sign by Party2") { c.signByParty2() }
-    _ <- recover("Failed to send email to Party1") { c.sendEmail(c.party1, "Contract signed!") }
-    _ <- recover("Failed to send email to Party2") { c.sendEmail(c.party2, "Contract signed!") }
+    c <- context("Failed to load contract") { ContractPersistence.load() }
+    c <- context("Contract is not in unsigned State") { c.asUnsigned() }
+    c <- context("Failed to sign by Party1") { c.signByParty1() }
+    c <- context("Failed to sign by Party2") { c.signByParty2() }
+    _ <- context("Failed to send email to Party1") { c.sendEmail(c.party1, "Contract signed!") }
+    _ <- context("Failed to send email to Party2") { c.sendEmail(c.party2, "Contract signed!") }
   yield (c)) match
     case Failure(e) => println(s"Operation failed: ${e.getMessage}")
     case Success(c) => println("Contract process completed successfully.")
