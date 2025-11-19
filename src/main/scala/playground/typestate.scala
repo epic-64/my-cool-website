@@ -28,23 +28,28 @@ object ContractBusiness:
 
 @main def main(): Unit =
   Contract("ABC123", "Alice", "Bob").toStatefulContract.save() match
-    case Failure(e) => println(s"Failed to save contract: ${e.getMessage}");
+    case Failure(err) => println(s"Failed to save contract: ${err.getMessage}");
     case Success(c) => c.signByParty1() match
-      case Failure(e) => println(s"Failed to sign by Party1: ${e.getMessage}");
+      case Failure(err) => println(s"Failed to sign by Party1: ${err.getMessage}");
       case Success(c) => c.signByParty2() match
-        case Failure(e) => println(s"Failed to sign by Party2: ${e.getMessage}");
+        case Failure(err) => println(s"Failed to sign by Party2: ${err.getMessage}");
         case Success(c) => c.sendEmail(c.party1, "Contract signed!") match
-          case Failure(e) => println(s"Failed to send email: ${e.getMessage}");
+          case Failure(err) => println(s"Failed to send email: ${err.getMessage}");
           case Success(_) => c.sendEmail(c.party2, "Contract signed!") match
-            case Failure(e) => println(s"Failed to send email: ${e.getMessage}");
+            case Failure(err) => println(s"Failed to send email: ${err.getMessage}");
             case Success(_) => println("Contract process completed successfully.")
 
+  def errContext[A](operation: String)(block: => Try[A]): Try[A] =
+    block.recoverWith:
+      case e => Failure(new Exception(s"$operation: ${e.getMessage}", e))
+
   (for
-    c <- Contract("ABC123", "Alice", "Bob").toStatefulContract.save()
-    c <- c.signByParty1()
-    c <- c.signByParty2()
-    _ <- c.sendEmail(c.party1, "Contract signed!")
-    _ <- c.sendEmail(c.party2, "Contract signed!")
+    c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
+    c <- errContext("Failed to save contract")(c.save())
+    c <- errContext("Failed to sign by Party1")(c.signByParty1())
+    c <- errContext("Failed to sign by Party2")(c.signByParty2())
+    _ <- errContext("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!"))
+    _ <- errContext("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!"))
   yield c) match
-    case Failure(e) => println(s"Operation failed: ${e.getMessage}");
+    case Failure(e) => println(s"Operation failed: ${e.getMessage}")
     case Success(c) => println("Contract process completed successfully.")
