@@ -84,11 +84,11 @@ def context[A](info: String)(block: => Try[A]): Try[A] =
 def example3(): Unit =
   (for
     c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
-    c <- context("Failed to save contract")(c.save())
-    c <- context("Failed to sign by Party1")(c.signByParty1())
-    c <- context("Failed to sign by Party2")(c.signByParty2())
-    _ <- context("Failed to send email to Party1")(c.sendEmail(c.party1, "Contract signed!"))
-    _ <- context("Failed to send email to Party2")(c.sendEmail(c.party2, "Contract signed!"))
+    c <- context("Failed to save contract") { c.save() }
+    c <- context("Failed to sign by Party1") { c.signByParty1() }
+    c <- context("Failed to sign by Party2") { c.signByParty2() }
+    _ <- context("Failed to send email to Party1") { c.sendEmail(c.party1, "Contract signed!") }
+    _ <- context("Failed to send email to Party2") { c.sendEmail(c.party2, "Contract signed!") }
   yield c) match
     case Failure(e) => println(s"Operation failed: ${e.getMessage}")
     case Success(c) => println("Contract process completed successfully.")
