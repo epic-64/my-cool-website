@@ -1,11 +1,11 @@
 package playground
 
-import ContractModelRW.*
+import playground.ContractModelRW.*
 import upickle.default.{read, write}
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
 import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
 import scala.util.chaining.scalaUtilChainingOps
 import scala.util.{Failure, Success, Try}
 
