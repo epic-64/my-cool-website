@@ -1,6 +1,5 @@
 package playground
 
-import models.{SignatureStatus, StatefulContract}
 import ContractState.*
 
 enum ContractState:
@@ -14,5 +13,6 @@ case class Contract[S <: ContractState](id: String, party1: String, party2: Stri
     Contract[FullySigned.type](id, party1, party2)
 
   def toStatefulContract(using ev: S =:= Unsigned.type): StatefulContract[Unsigned.type] =
-    StatefulContract(id, party1, party2, SignatureStatus(true, None), SignatureStatus(true, None), Unsigned)
+    StatefulContract(id, party1, party2, None, None, Unsigned)
+
 

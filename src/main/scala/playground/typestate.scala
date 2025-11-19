@@ -1,7 +1,6 @@
 package playground
 
-import models.ContractModelRW.*
-import models.{StatefulContract, StatefulContractDto}
+import ContractModelRW.*
 import upickle.default.{read, write}
 
 import java.nio.charset.StandardCharsets
