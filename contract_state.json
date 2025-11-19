@@ -5,13 +5,13 @@
   "party1Signature": {
     "signed": true,
     "timestamp": [
-      "2025-11-20T14:52:46.099365113Z"
+      "2025-11-20T14:54:31.739887526Z"
     ]
   },
   "party2Signature": {
     "signed": true,
     "timestamp": [
-      "2025-11-20T14:52:46.099859076Z"
+      "2025-11-20T14:54:31.740448303Z"
     ]
   },
   "state": "FullySigned"

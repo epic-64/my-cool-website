@@ -22,13 +22,8 @@ object ContractPersistence {
     dto.toTyped
 }
 
-object ContractBusiness:
-  def initialize(id: String, party1: String, party2: String): StatefulContract[ContractState.Unsigned.type] =
-    val unsigned = SignatureStatus(signed = false, timestamp = None)
-    StatefulContract(id, party1, party2, unsigned, unsigned, ContractState.Unsigned)
-
 def example1(): Unit =
-  val contract = ContractBusiness.initialize("ABC123", "Alice", "Bob")
+  val contract = Contract("ABC123", "Alice", "Bob").toStatefulContract
 
   val saved = try {
     contract.save().get
@@ -91,7 +86,7 @@ def recover[A](operation: String)(block: => Try[A]): Try[A] =
 
 def example3(): Unit =
   (for
-    c <- Success(ContractBusiness.initialize("ABC123", "Alice", "Bob"))
+    c <- Success(Contract("ABC123", "Alice", "Bob").toStatefulContract)
     c <- recover("Failed to save contract")(c.save())
     c <- recover("Failed to sign by Party1")(c.signByParty1())
     c <- recover("Failed to sign by Party2")(c.signByParty2())
