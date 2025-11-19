@@ -26,43 +26,15 @@ object ContractBusiness:
     val unsigned = SignatureStatus(signed = false, timestamp = None)
     StatefulContract(id, party1, party2, unsigned, unsigned, ContractState.Unsigned)
 
-  def signByParty1(stateful: StatefulContract): Try[StatefulContract] =
-    if stateful.state != ContractState.Unsigned then
-      Failure(new Exception("Invalid state: Party1 cannot sign now."))
-    else
-      val contract = Contract[ContractState.Unsigned.type](stateful.id, stateful.party1, stateful.party2)
-      val next = contract.signByParty1
-      val updated = StatefulContract.fromContract(
-        contract = next,
-        party1Sig = SignatureStatus(true, Some(Instant.now)),
-        party2Sig = stateful.party2Signature,
-        state = ContractState.Party1Signed
-      )
-      sendEmail(stateful.party1, stateful.id, "Party1 signed the contract.")
-      ContractPersistence.save(updated).map(_ => updated)
-
-  def signByParty2(stateful: StatefulContract): Try[StatefulContract] =
-    if stateful.state != ContractState.Party1Signed then Failure(new Exception("Invalid state: Party2 cannot sign now."))
-    else
-      val contract = Contract[ContractState.Party1Signed.type](stateful.id, stateful.party1, stateful.party2)
-      val next = contract.signByParty2
-      val updated = StatefulContract.fromContract(next,
-        stateful.party1Signature, SignatureStatus(true, Some(Instant.now)), ContractState.FullySigned)
-      sendEmail(stateful.party2, stateful.id, "Party2 signed the contract.")
-      ContractPersistence.save(updated).map(_ => updated)
-
-  def sendEmail(recipient: String, contractId: String, message: String): Try[Unit] = Try:
-    println(s"Sending email to $recipient: $message")
-
 @main def main(): Unit =
   Contract("ABC123", "Alice", "Bob").toStatefulContract.save() match
     case Failure(e) => println(s"Failed to save contract: ${e.getMessage}");
-    case Success(c) => ContractBusiness.signByParty1(c) match
+    case Success(c) => c.signByParty1() match
       case Failure(e) => println(s"Failed to sign by Party1: ${e.getMessage}");
-      case Success(c) => ContractBusiness.signByParty2(c) match
+      case Success(c) => c.signByParty2() match
         case Failure(e) => println(s"Failed to sign by Party2: ${e.getMessage}");
-        case Success(c) => ContractBusiness.sendEmail(c.party1, c.id, "Contract signed!") match
+        case Success(c) => c.sendEmail(c.party1, "Contract signed!") match
           case Failure(e) => println(s"Failed to send email: ${e.getMessage}");
-          case Success(_) => ContractBusiness.sendEmail(c.party2, c.id, "Contract signed!") match
+          case Success(_) => c.sendEmail(c.party2, "Contract signed!") match
             case Failure(e) => println(s"Failed to send email: ${e.getMessage}");
             case Success(_) => println("Contract process completed successfully.")
