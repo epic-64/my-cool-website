@@ -15,7 +15,8 @@ case class StatefulContract[S <: ContractState](
   party2Signature: Option[Instant],
   state: S
 ):
-  def save(): Try[StatefulContract[S]] = playground.ContractPersistence.save(this).map(_ => this)
+  def save(): Try[StatefulContract[S]] =
+    playground.ContractPersistence.save(this).map(_ => this)
 
   def sendEmail(recipient: String, message: String)(using ev: S =:= FullySigned.type): Try[Unit] = Try:
     println(s"Sending email to $recipient: $message")
