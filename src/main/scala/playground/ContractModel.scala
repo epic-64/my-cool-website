@@ -1,7 +1,9 @@
 package playground
 
+import playground.ContractModelRW.statefulContractDtoRW
 import playground.ContractState.*
 import playground.{Contract, ContractPersistence, ContractState}
+import upickle.default.ReadWriter.join
 import upickle.default.{ReadWriter, macroRW}
 
 import java.time.Instant
@@ -65,10 +67,16 @@ case class StatefulContractDto(
       case FullySigned => StatefulContract[FullySigned.type](id, party1, party2, party1Signature, party2Signature, FullySigned)
       case _ => throw new Exception(s"Invalid state for FullySigned: $state")
 
+  def toJson: String = upickle.default.write(this)
+
   def asTyped(): Try[StatefulContract[? <: ContractState]] = state match
     case Unsigned => asUnsigned()
     case Party1Signed => asParty1Signed()
     case FullySigned => asFullySigned()
+
+object StatefulContractDto:
+  def fromStatefulContract[S <: ContractState](sc: StatefulContract[S]): StatefulContractDto =
+    StatefulContractDto(sc.id, sc.party1, sc.party2, sc.party1Signature, sc.party2Signature, sc.state)
 
 object ContractModelRW:
   implicit val instantRW: ReadWriter[Instant] = upickle.default.readwriter[String].bimap[Instant](

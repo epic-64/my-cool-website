@@ -20,12 +20,10 @@ object ContractPersistence:
   def filePath(id: String) = s"data/contract_state_$id.json"
 
   def save(contract: StatefulContract[? <: ContractState]): Try[Unit] = Try:
-    val dto = StatefulContractDto(contract.id, contract.party1, contract.party2, contract.party1Signature, contract.party2Signature, contract.state)
-    val json = write(dto)
-
-    File(filePath(contract.id)).tap: file =>
-      Option(file.getParentFile).foreach(_.mkdirs())
-      file.writeText(json)
+    StatefulContractDto.fromStatefulContract(contract).toJson.tap: json =>
+      File(filePath(contract.id)).tap: file =>
+        Option(file.getParentFile).foreach(_.mkdirs())
+        file.writeText(json)
 
   def load(id: String): Try[StatefulContractDto] = Try:
     val json = File(filePath(id)).readText().get
