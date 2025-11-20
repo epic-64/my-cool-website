@@ -1,4 +1,7 @@
 package playground.play1
 
+import scala.util.Try
+
 @main def dumb =
-  val x = None.get
+  Try(None.get).recover{ case e => e.printStackTrace() }
+  Try(List().head).recover{ case e => e.printStackTrace() }
