@@ -1,13 +1,12 @@
 package playground
 
-import playground.ContractModelRW.statefulContractDtoRW
-import playground.ContractState.*
-import playground.{Contract, ContractPersistence, ContractState}
+import ContractModelRW.statefulContractDtoRW
+import ContractState.*
 import upickle.default.ReadWriter.join
 import upickle.default.{ReadWriter, macroRW}
 
 import java.time.Instant
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 case class StatefulContract[S <: ContractState](
   id: String,
