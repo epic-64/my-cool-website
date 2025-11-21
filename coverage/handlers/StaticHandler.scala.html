@@ -1,0 +1,443 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          handlers/StaticHandler.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package handlers
+</span>2 <span style=''>
+</span>3 <span style=''>import org.apache.pekko.http.scaladsl.model.headers.RawHeader
+</span>4 <span style=''>import org.apache.pekko.http.scaladsl.server.Directives.*
+</span>5 <span style=''>import org.apache.pekko.http.scaladsl.server.Route
+</span>6 <span style=''>
+</span>7 <span style=''>object StaticHandler:
+</span>8 <span style=''>  </span><span style='background: #F0ADAD'>def routes</span><span style=''>: Route = </span><span style='background: #F0ADAD'>concat(
+</span>9 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;assets-test&quot;) {
+</span>10 <span style=''></span><span style='background: #F0ADAD'>      getFromResource(&quot;public/assets/css/style.css&quot;)
+</span>11 <span style=''></span><span style='background: #F0ADAD'>    },
+</span>12 <span style=''></span><span style='background: #F0ADAD'>    pathPrefix(&quot;assets&quot;) {
+</span>13 <span style=''></span><span style='background: #F0ADAD'>      respondWithHeader(RawHeader(&quot;Cache-Control&quot;, &quot;public, max-age=86400&quot;)) {
+</span>14 <span style=''></span><span style='background: #F0ADAD'>        getFromResourceDirectory(&quot;public/assets&quot;)
+</span>15 <span style=''></span><span style='background: #F0ADAD'>      }
+</span>16 <span style=''></span><span style='background: #F0ADAD'>    },
+</span>17 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          8
+        </td>
+        <td>
+          209
+        </td>
+        <td>
+          234
+          -
+          502
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          concat
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          concat(\n    path(&quot;assets-test&quot;) {\n      getFromResource(&quot;public/assets/css/style.css&quot;)\n    },\n    pathPrefix(&quot;assets&quot;) {\n      respondWithHeader(RawHeader(&quot;Cache-Control&quot;, &quot;public, max-age=86400&quot;)) {\n        getFromResourceDirectory(&quot;public/assets&quot;)\n      }\n    },\n  )
+        </td>
+      </tr><tr>
+        <td>
+          8
+        </td>
+        <td>
+          224
+        </td>
+        <td>
+          214
+          -
+          224
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def routes
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          211
+        </td>
+        <td>
+          246
+          -
+          265
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;assets-test&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          210
+        </td>
+        <td>
+          246
+          -
+          326
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;assets-test&quot;) {\n      getFromResource(&quot;public/assets/css/style.css&quot;)\n    }
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          213
+        </td>
+        <td>
+          251
+          -
+          264
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;assets-test&quot;
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          212
+        </td>
+        <td>
+          246
+          -
+          265
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;assets-test&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          214
+        </td>
+        <td>
+          274
+          -
+          320
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getFromResource
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getFromResource(&quot;public/assets/css/style.css&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          218
+        </td>
+        <td>
+          343
+          -
+          351
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;assets&quot;
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          217
+        </td>
+        <td>
+          332
+          -
+          352
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          pathPrefix
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          pathPrefix(&quot;assets&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          216
+        </td>
+        <td>
+          332
+          -
+          352
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          pathPrefix(&quot;assets&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          215
+        </td>
+        <td>
+          332
+          -
+          497
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          pathPrefix(&quot;assets&quot;) {\n      respondWithHeader(RawHeader(&quot;Cache-Control&quot;, &quot;public, max-age=86400&quot;)) {\n        getFromResourceDirectory(&quot;public/assets&quot;)\n      }\n    }
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          220
+        </td>
+        <td>
+          361
+          -
+          431
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          respondWithHeader(RawHeader(&quot;Cache-Control&quot;, &quot;public, max-age=86400&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          219
+        </td>
+        <td>
+          361
+          -
+          491
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          respondWithHeader(RawHeader(&quot;Cache-Control&quot;, &quot;public, max-age=86400&quot;)) {\n        getFromResourceDirectory(&quot;public/assets&quot;)\n      }
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          221
+        </td>
+        <td>
+          361
+          -
+          431
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          respondWithHeader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          respondWithHeader(RawHeader(&quot;Cache-Control&quot;, &quot;public, max-age=86400&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          223
+        </td>
+        <td>
+          442
+          -
+          466
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          getFromResourceDirectory$default$2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getFromResourceDirectory
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          222
+        </td>
+        <td>
+          442
+          -
+          483
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getFromResourceDirectory
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getFromResourceDirectory(&quot;public/assets&quot;)
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

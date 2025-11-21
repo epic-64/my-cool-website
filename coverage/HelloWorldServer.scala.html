@@ -1,0 +1,442 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          HelloWorldServer.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>import org.apache.pekko.actor.ActorSystem
+</span>2 <span style=''>import org.apache.pekko.http.scaladsl.Http
+</span>3 <span style=''>
+</span>4 <span style=''>import scala.concurrent.duration.Duration
+</span>5 <span style=''>import scala.concurrent.{Await, ExecutionContextExecutor}
+</span>6 <span style=''>
+</span>7 <span style=''>object HelloWorldServer:
+</span>8 <span style=''>  </span><span style='background: #F0ADAD'>def main</span><span style=''>(args: Array[String]): Unit =
+</span>9 <span style=''>    implicit val system: ActorSystem                        = </span><span style='background: #F0ADAD'>ActorSystem(&quot;my-actor-system&quot;)</span><span style=''>
+</span>10 <span style=''>    implicit val executionContext: ExecutionContextExecutor = </span><span style='background: #F0ADAD'>system.dispatcher</span><span style=''>
+</span>11 <span style=''>
+</span>12 <span style=''>    val port          = </span><span style='background: #F0ADAD'>sys.env.getOrElse(&quot;PORT&quot;, &quot;8080&quot;).toInt</span><span style=''>
+</span>13 <span style=''>    val bindingFuture = </span><span style='background: #F0ADAD'>Http().newServerAt(&quot;0.0.0.0&quot;, port).bind(Routes.allRoutes)</span><span style=''>
+</span>14 <span style=''>
+</span>15 <span style=''>    </span><span style='background: #F0ADAD'>println(&quot;Server running at http://localhost:8080/&quot;)</span><span style=''>
+</span>16 <span style=''>    </span><span style='background: #F0ADAD'>Await.result(bindingFuture.flatMap(_.whenTerminated), Duration.Inf)</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          8
+        </td>
+        <td>
+          15
+        </td>
+        <td>
+          214
+          -
+          222
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          main
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def main
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          0
+        </td>
+        <td>
+          314
+          -
+          344
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ActorSystem(&quot;my-actor-system&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          1
+        </td>
+        <td>
+          407
+          -
+          424
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          dispatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          system.dispatcher
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          2
+        </td>
+        <td>
+          450
+          -
+          483
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          augmentString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          sys.env.getOrElse(&quot;PORT&quot;, &quot;8080&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          5
+        </td>
+        <td>
+          450
+          -
+          489
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toInt
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          sys.env.getOrElse(&quot;PORT&quot;, &quot;8080&quot;).toInt
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          4
+        </td>
+        <td>
+          450
+          -
+          457
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          env
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          sys.env
+        </td>
+      </tr><tr>
+        <td>
+          12
+        </td>
+        <td>
+          3
+        </td>
+        <td>
+          450
+          -
+          483
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          sys.env.getOrElse(&quot;PORT&quot;, &quot;8080&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          8
+        </td>
+        <td>
+          514
+          -
+          520
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Http()
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          7
+        </td>
+        <td>
+          514
+          -
+          549
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          newServerAt
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Http().newServerAt(&quot;0.0.0.0&quot;, port)
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          10
+        </td>
+        <td>
+          555
+          -
+          571
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          allRoutes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Routes.allRoutes
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          9
+        </td>
+        <td>
+          555
+          -
+          571
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          routeToFunction
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Routes.allRoutes
+        </td>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          6
+        </td>
+        <td>
+          514
+          -
+          572
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          bind
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Http().newServerAt(&quot;0.0.0.0&quot;, port).bind(Routes.allRoutes)
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          11
+        </td>
+        <td>
+          578
+          -
+          629
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(&quot;Server running at http://localhost:8080/&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          14
+        </td>
+        <td>
+          669
+          -
+          685
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          whenTerminated
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _.whenTerminated
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          13
+        </td>
+        <td>
+          647
+          -
+          686
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          bindingFuture.flatMap(_.whenTerminated)
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          12
+        </td>
+        <td>
+          634
+          -
+          701
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          result
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Await.result(bindingFuture.flatMap(_.whenTerminated), Duration.Inf)
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

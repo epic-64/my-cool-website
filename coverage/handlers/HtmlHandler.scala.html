@@ -1,0 +1,2983 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          handlers/HtmlHandler.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package handlers
+</span>2 <span style=''>
+</span>3 <span style=''>import com.typesafe.config.ConfigFactory
+</span>4 <span style=''>import org.apache.pekko.http.scaladsl.model.headers.HttpCookie
+</span>5 <span style=''>import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity}
+</span>6 <span style=''>import org.apache.pekko.http.scaladsl.server.Directives.*
+</span>7 <span style=''>import org.apache.pekko.http.scaladsl.server.Route
+</span>8 <span style=''>import upickle.default.*
+</span>9 <span style=''>
+</span>10 <span style=''>import java.nio.file.{Files, Paths, StandardOpenOption}
+</span>11 <span style=''>import scala.util.{Random, Try}
+</span>12 <span style=''>
+</span>13 <span style=''>case class UserCounter(counter: Int)
+</span>14 <span style=''>
+</span>15 <span style=''>object UserCounter:
+</span>16 <span style=''>  given ReadWriter</span><span style='background: #F0ADAD'>[UserCount</span><span style=''>er] = </span><span style='background: #F0ADAD'>macroRW</span><span style=''>
+</span>17 <span style=''>
+</span>18 <span style=''>object UserCounterSto</span><span style='background: #F0ADAD'>rage:
+</span>19 <span style=''></span><span style='background: #F0ADAD'>  pr</span><span style=''>ivate val config  = </span><span style='background: #F0ADAD'>ConfigFactory.load()</span><span style=''>
+</span>20 <span style=''>  private val</span><span style='background: #F0ADAD'> baseDir = Paths.get(config.getString(&quot;storage.userDataPath&quot;))</span><span style=''>
+</span>21 <span style=''>
+</span>22 <span style=''>  </span><span style='background: #F0ADAD'>private def userFilePath</span><span style=''>(userId: String) = </span><span style='background: #F0ADAD'>baseDir.resolve(s&quot;user_$userId.json&quot;)</span><span style=''>
+</span>23 <span style=''>
+</span>24 <span style=''>  </span><span style='background: #F0ADAD'>def readCounter</span><span style=''>(userId: String): UserCounter =
+</span>25 <span style=''>    val path = </span><span style='background: #F0ADAD'>userFilePath(userId)</span><span style=''>
+</span>26 <span style=''>    if </span><span style='background: #F0ADAD'>Files.exists(path)</span><span style=''> then
+</span>27 <span style=''>      </span><span style='background: #F0ADAD'>val content = Files.readString(path)
+</span>28 <span style=''></span><span style='background: #F0ADAD'>      Try(read[UserCounter](content)).getOrElse(UserCounter(0))</span><span style=''>
+</span>29 <span style=''>    else </span><span style='background: #F0ADAD'>UserCounter(0)</span><span style=''>
+</span>30 <span style=''>
+</span>31 <span style=''>  </span><span style='background: #F0ADAD'>def writeCounter(userId: Str</span><span style=''>ing, counter: UserCounter): Unit =
+</span>32 <span style=''>    val path = </span><span style='background: #F0ADAD'>userFilePath(userId)</span><span style=''>
+</span>33 <span style=''>    </span><span style='background: #F0ADAD'>Files.createDirectories(path.getParent)</span><span style=''>
+</span>34 <span style=''>    </span><span style='background: #F0ADAD'>Files.writeString(
+</span>35 <span style=''></span><span style='background: #F0ADAD'>      path,
+</span>36 <span style=''></span><span style='background: #F0ADAD'>      write(counter, indent = 2), // Pretty print for easy reading
+</span>37 <span style=''></span><span style='background: #F0ADAD'>      StandardOpenOption.CREATE,
+</span>38 <span style=''></span><span style='background: #F0ADAD'>      StandardOpenOption.TRUNCATE_EXISTING
+</span>39 <span style=''></span><span style='background: #F0ADAD'>    )</span><span style=''>
+</span>40 <span style=''>
+</span>41 <span style=''></span><span style='background: #F0ADAD'>def withUserSession</span><span style=''>(innerRoute: String =&gt; Route): Route = {
+</span>42 <span style=''>  val cookieName = &quot;userId&quot;
+</span>43 <span style=''>
+</span>44 <span style=''>  </span><span style='background: #F0ADAD'>optionalCookie(cookieName) {
+</span>45 <span style=''></span><span style='background: #F0ADAD'>    case Some(cookie) =&gt; innerRoute(cookie.value)
+</span>46 <span style=''></span><span style='background: #F0ADAD'>    case None         =&gt;
+</span>47 <span style=''></span><span style='background: #F0ADAD'>      val newUserId = Random.alphanumeric.take(12).mkString
+</span>48 <span style=''></span><span style='background: #F0ADAD'>      val cookie    = HttpCookie(cookieName, value = newUserId, path = Some(&quot;/&quot;))
+</span>49 <span style=''></span><span style='background: #F0ADAD'>      setCookie(cookie)(innerRoute(newUserId))
+</span>50 <span style=''></span><span style='background: #F0ADAD'>  }</span><span style=''>
+</span>51 <span style=''>}
+</span>52 <span style=''>
+</span>53 <span style=''></span><span style='background: #F0ADAD'>def getFrontendVersion</span><span style=''>: Long = 0L
+</span>54 <span style=''>
+</span>55 <span style=''></span><span style='background: #F0ADAD'>def renderHelloTwirl</span><span style=''>(name: String): String =
+</span>56 <span style=''>  </span><span style='background: #F0ADAD'>views.html.hello(name, getFrontendVersion).toString</span><span style=''>
+</span>57 <span style=''>
+</span>58 <span style=''></span><span style='background: #F0ADAD'>def renderPong</span><span style=''>(userId: String): String = {
+</span>59 <span style=''>  val emojis = </span><span style='background: #F0ADAD'>List(
+</span>60 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFAADD&quot;),
+</span>61 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFBBDD&quot;),
+</span>62 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFCCDD&quot;),
+</span>63 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFDDDD&quot;),
+</span>64 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFEEDD&quot;),
+</span>65 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFDDDD&quot;),
+</span>66 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFCCDD&quot;),
+</span>67 <span style=''></span><span style='background: #F0ADAD'>    (&quot;🏓&quot;, &quot;#FFBBDD&quot;),
+</span>68 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span>69 <span style=''>
+</span>70 <span style=''>  val current   = </span><span style='background: #F0ADAD'>UserCounterStorage.readCounter(userId)</span><span style=''>
+</span>71 <span style=''>  val nextIndex = (current.counter + 1) % </span><span style='background: #F0ADAD'>emojis.size</span><span style=''>
+</span>72 <span style=''>  </span><span style='background: #F0ADAD'>UserCounterStorage.writeCounter(userId, UserCounter(nextIndex))</span><span style=''>
+</span>73 <span style=''>
+</span>74 <span style=''>  val (emoji, color) = </span><span style='background: #F0ADAD'>emojis(current.counter)</span><span style=''>
+</span>75 <span style=''>  </span><span style='background: #F0ADAD'>views.html.pong(emoji, color).toString</span><span style=''>
+</span>76 <span style=''>}
+</span>77 <span style=''>
+</span>78 <span style=''>extension (content: String) </span><span style='background: #F0ADAD'>def toUtf8Http</span><span style=''>: Route = </span><span style='background: #F0ADAD'>complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, content))</span><span style=''>
+</span>79 <span style=''>
+</span>80 <span style=''>object HtmlHandler:
+</span>81 <span style=''>  </span><span style='background: #F0ADAD'>def routes</span><span style=''>: Route = </span><span style='background: #F0ADAD'>concat(
+</span>82 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;fastping&quot;)(complete(&quot;Pong&quot;)),
+</span>83 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;hello&quot; / Segment)(name =&gt; renderHelloTwirl(name).toUtf8Http),
+</span>84 <span style=''></span><span style='background: #F0ADAD'>    path(&quot;ping&quot;)(withUserSession(userId =&gt; renderPong(userId).toUtf8Http))
+</span>85 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          92
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          headOption
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          101
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          110
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          95
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          122
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          113
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          98
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          106
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          115
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          118
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          100
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          109
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          91
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          121
+        </td>
+        <td>
+          493
+          -
+          503
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          [UserCount
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          103
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          112
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          97
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          120
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          114
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitEnd
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          90
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          108
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          117
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          93
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          allowUnknownKeys
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          102
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          111
+        </td>
+        <td>
+          509
+          -
+          516
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          107
+        </td>
+        <td>
+          539
+          -
+          549
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          rage:\n  pr
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          123
+        </td>
+        <td>
+          569
+          -
+          589
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          load
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ConfigFactory.load()
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          125
+        </td>
+        <td>
+          624
+          -
+          664
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          config.getString(&quot;storage.userDataPath&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          116
+        </td>
+        <td>
+          603
+          -
+          622
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          write0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+           baseDir = Paths.ge
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          124
+        </td>
+        <td>
+          614
+          -
+          665
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Paths.get(config.getString(&quot;storage.userDataPath&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          128
+        </td>
+        <td>
+          669
+          -
+          693
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          userFilePath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          private def userFilePath
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          127
+        </td>
+        <td>
+          728
+          -
+          748
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;user_$userId.json&quot;
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          126
+        </td>
+        <td>
+          712
+          -
+          749
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          resolve
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          baseDir.resolve(s&quot;user_$userId.json&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          139
+        </td>
+        <td>
+          753
+          -
+          768
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          readCounter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def readCounter
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          129
+        </td>
+        <td>
+          815
+          -
+          835
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          userFilePath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          userFilePath(userId)
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          130
+        </td>
+        <td>
+          843
+          -
+          861
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          exists
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Files.exists(path)
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          137
+        </td>
+        <td>
+          873
+          -
+          973
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          val content = Files.readString(path)\n      Try(read[UserCounter](content)).getOrElse(UserCounter(0))
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          131
+        </td>
+        <td>
+          887
+          -
+          909
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Files.readString(path)
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          134
+        </td>
+        <td>
+          920
+          -
+          946
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          read
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          read[UserCounter](content)
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          133
+        </td>
+        <td>
+          916
+          -
+          947
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(read[UserCounter](content))
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          136
+        </td>
+        <td>
+          920
+          -
+          937
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          read$default$2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          read[UserCounter]
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          132
+        </td>
+        <td>
+          916
+          -
+          973
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(read[UserCounter](content)).getOrElse(UserCounter(0))
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          135
+        </td>
+        <td>
+          938
+          -
+          945
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          content
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          138
+        </td>
+        <td>
+          983
+          -
+          997
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          UserCounter(0)
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          119
+        </td>
+        <td>
+          1012
+          -
+          1029
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeToObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          unter(userId: Str
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          147
+        </td>
+        <td>
+          1001
+          -
+          1017
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeCounter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def writeCounter
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          140
+        </td>
+        <td>
+          1079
+          -
+          1099
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          userFilePath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          userFilePath(userId)
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          142
+        </td>
+        <td>
+          1128
+          -
+          1142
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getParent
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path.getParent
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          141
+        </td>
+        <td>
+          1104
+          -
+          1143
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          createDirectories
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Files.createDirectories(path.getParent)
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          143
+        </td>
+        <td>
+          1148
+          -
+          1327
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Files.writeString(\n      path,\n      write(counter, indent = 2), // Pretty print for easy reading\n      StandardOpenOption.CREATE,\n      StandardOpenOption.TRUNCATE_EXISTING\n    )
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          146
+        </td>
+        <td>
+          1185
+          -
+          1190
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          write$default$4
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          write
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          145
+        </td>
+        <td>
+          1185
+          -
+          1190
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          write$default$3
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          write
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          144
+        </td>
+        <td>
+          1185
+          -
+          1211
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          write
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          write(counter, indent = 2)
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          190
+        </td>
+        <td>
+          1329
+          -
+          1348
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          withUserSession
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def withUserSession
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          172
+        </td>
+        <td>
+          1420
+          -
+          1446
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          optionalCookie
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          optionalCookie(cookieName)
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          171
+        </td>
+        <td>
+          1420
+          -
+          1446
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addDirectiveApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          optionalCookie(cookieName)
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          170
+        </td>
+        <td>
+          1420
+          -
+          1716
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          optionalCookie(cookieName) {\n    case Some(cookie) =&gt; innerRoute(cookie.value)\n    case None         =&gt;\n      val newUserId = Random.alphanumeric.take(12).mkString\n      val cookie    = HttpCookie(cookieName, value = newUserId, path = Some(&quot;/&quot;))\n      setCookie(cookie)(innerRoute(newUserId))\n  }
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          173
+        </td>
+        <td>
+          1474
+          -
+          1498
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          innerRoute(cookie.value)
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          174
+        </td>
+        <td>
+          1471
+          -
+          1498
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; innerRoute(cookie.value)
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          176
+        </td>
+        <td>
+          1546
+          -
+          1565
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          alphanumeric
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Random.alphanumeric
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          175
+        </td>
+        <td>
+          1546
+          -
+          1574
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          take
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Random.alphanumeric.take(12)
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          189
+        </td>
+        <td>
+          1530
+          -
+          1712
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          val newUserId = Random.alphanumeric.take(12).mkString\n      val cookie    = HttpCookie(cookieName, value = newUserId, path = Some(&quot;/&quot;))\n      setCookie(cookie)(innerRoute(newUserId))
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          177
+        </td>
+        <td>
+          1546
+          -
+          1583
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          mkString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Random.alphanumeric.take(12).mkString
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          182
+        </td>
+        <td>
+          1606
+          -
+          1616
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          apply$default$8
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          184
+        </td>
+        <td>
+          1606
+          -
+          1665
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie(cookieName, value = newUserId, path = Some(&quot;/&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          178
+        </td>
+        <td>
+          1606
+          -
+          1616
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          apply$default$3
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          181
+        </td>
+        <td>
+          1606
+          -
+          1616
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          apply$default$7
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          180
+        </td>
+        <td>
+          1606
+          -
+          1616
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          apply$default$5
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          183
+        </td>
+        <td>
+          1606
+          -
+          1616
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          apply$default$9
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          179
+        </td>
+        <td>
+          1606
+          -
+          1616
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          apply$default$4
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpCookie
+        </td>
+      </tr><tr>
+        <td>
+          49
+        </td>
+        <td>
+          185
+        </td>
+        <td>
+          1672
+          -
+          1712
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          setCookie(cookie)(innerRoute(newUserId))
+        </td>
+      </tr><tr>
+        <td>
+          49
+        </td>
+        <td>
+          187
+        </td>
+        <td>
+          1672
+          -
+          1689
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          setCookie
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          setCookie(cookie)
+        </td>
+      </tr><tr>
+        <td>
+          49
+        </td>
+        <td>
+          186
+        </td>
+        <td>
+          1672
+          -
+          1689
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          setCookie(cookie)
+        </td>
+      </tr><tr>
+        <td>
+          49
+        </td>
+        <td>
+          188
+        </td>
+        <td>
+          1690
+          -
+          1711
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          innerRoute(newUserId)
+        </td>
+      </tr><tr>
+        <td>
+          53
+        </td>
+        <td>
+          191
+        </td>
+        <td>
+          1720
+          -
+          1742
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          getFrontendVersion
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def getFrontendVersion
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          195
+        </td>
+        <td>
+          1755
+          -
+          1775
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          renderHelloTwirl
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def renderHelloTwirl
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          194
+        </td>
+        <td>
+          1802
+          -
+          1853
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.hello(name, getFrontendVersion).toString
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          193
+        </td>
+        <td>
+          1825
+          -
+          1843
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          getFrontendVersion
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          getFrontendVersion
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          192
+        </td>
+        <td>
+          1802
+          -
+          1844
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.hello(name, getFrontendVersion)
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          204
+        </td>
+        <td>
+          1855
+          -
+          1869
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          renderPong
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def renderPong
+        </td>
+      </tr><tr>
+        <td>
+          59
+        </td>
+        <td>
+          196
+        </td>
+        <td>
+          1913
+          -
+          2106
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List(\n    (&quot;🏓&quot;, &quot;#FFAADD&quot;),\n    (&quot;🏓&quot;, &quot;#FFBBDD&quot;),\n    (&quot;🏓&quot;, &quot;#FFCCDD&quot;),\n    (&quot;🏓&quot;, &quot;#FFDDDD&quot;),\n    (&quot;🏓&quot;, &quot;#FFEEDD&quot;),\n    (&quot;🏓&quot;, &quot;#FFDDDD&quot;),\n    (&quot;🏓&quot;, &quot;#FFCCDD&quot;),\n    (&quot;🏓&quot;, &quot;#FFBBDD&quot;),\n  )
+        </td>
+      </tr><tr>
+        <td>
+          70
+        </td>
+        <td>
+          197
+        </td>
+        <td>
+          2126
+          -
+          2164
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readCounter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          UserCounterStorage.readCounter(userId)
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          198
+        </td>
+        <td>
+          2207
+          -
+          2218
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          size
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          emojis.size
+        </td>
+      </tr><tr>
+        <td>
+          72
+        </td>
+        <td>
+          199
+        </td>
+        <td>
+          2221
+          -
+          2284
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeCounter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          UserCounterStorage.writeCounter(userId, UserCounter(nextIndex))
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          200
+        </td>
+        <td>
+          2309
+          -
+          2332
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          emojis(current.counter)
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          201
+        </td>
+        <td>
+          2306
+          -
+          2306
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          75
+        </td>
+        <td>
+          202
+        </td>
+        <td>
+          2335
+          -
+          2364
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.pong(emoji, color)
+        </td>
+      </tr><tr>
+        <td>
+          75
+        </td>
+        <td>
+          203
+        </td>
+        <td>
+          2335
+          -
+          2373
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          views.html.pong(emoji, color).toString
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          205
+        </td>
+        <td>
+          2429
+          -
+          2491
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          complete
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, content))
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          208
+        </td>
+        <td>
+          2405
+          -
+          2419
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          toUtf8Http
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def toUtf8Http
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          207
+        </td>
+        <td>
+          2438
+          -
+          2490
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpEntity(ContentTypes.`text/html(UTF-8)`, content)
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          206
+        </td>
+        <td>
+          2438
+          -
+          2490
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpEntity(ContentTypes.`text/html(UTF-8)`, content)
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          169
+        </td>
+        <td>
+          2515
+          -
+          2525
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          routes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def routes
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          148
+        </td>
+        <td>
+          2535
+          -
+          2733
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          concat
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          concat(\n    path(&quot;fastping&quot;)(complete(&quot;Pong&quot;)),\n    path(&quot;hello&quot; / Segment)(name =&gt; renderHelloTwirl(name).toUtf8Http),\n    path(&quot;ping&quot;)(withUserSession(userId =&gt; renderPong(userId).toUtf8Http))\n  )
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          149
+        </td>
+        <td>
+          2547
+          -
+          2581
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;fastping&quot;)(complete(&quot;Pong&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          151
+        </td>
+        <td>
+          2547
+          -
+          2563
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;fastping&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          154
+        </td>
+        <td>
+          2573
+          -
+          2579
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;Pong&quot;
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          150
+        </td>
+        <td>
+          2547
+          -
+          2563
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;fastping&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          153
+        </td>
+        <td>
+          2564
+          -
+          2580
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          complete
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          complete(&quot;Pong&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          152
+        </td>
+        <td>
+          2552
+          -
+          2562
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;fastping&quot;
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          155
+        </td>
+        <td>
+          2587
+          -
+          2653
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;hello&quot; / Segment)(name =&gt; renderHelloTwirl(name).toUtf8Http)
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          158
+        </td>
+        <td>
+          2592
+          -
+          2609
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          /
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;hello&quot; / Segment
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          160
+        </td>
+        <td>
+          2619
+          -
+          2652
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toUtf8Http
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderHelloTwirl(name).toUtf8Http
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          157
+        </td>
+        <td>
+          2587
+          -
+          2610
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;hello&quot; / Segment)
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          156
+        </td>
+        <td>
+          2587
+          -
+          2610
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addDirectiveApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;hello&quot; / Segment)
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          159
+        </td>
+        <td>
+          2592
+          -
+          2599
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;hello&quot;
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          161
+        </td>
+        <td>
+          2619
+          -
+          2641
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          renderHelloTwirl
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderHelloTwirl(name)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          164
+        </td>
+        <td>
+          2659
+          -
+          2671
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;ping&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          167
+        </td>
+        <td>
+          2698
+          -
+          2727
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toUtf8Http
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderPong(userId).toUtf8Http
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          166
+        </td>
+        <td>
+          2672
+          -
+          2728
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          withUserSession
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          withUserSession(userId =&gt; renderPong(userId).toUtf8Http)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          163
+        </td>
+        <td>
+          2659
+          -
+          2671
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addByNameNullaryApply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;ping&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          165
+        </td>
+        <td>
+          2664
+          -
+          2670
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _segmentStringToPathMatcher
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;ping&quot;
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          168
+        </td>
+        <td>
+          2698
+          -
+          2716
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          renderPong
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          renderPong(userId)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          162
+        </td>
+        <td>
+          2659
+          -
+          2729
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path(&quot;ping&quot;)(withUserSession(userId =&gt; renderPong(userId).toUtf8Http))
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          104
+        </td>
+        <td>
+          3048
+          -
+          3073
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allKeysArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          94
+        </td>
+        <td>
+          2812
+          -
+          2834
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          visitors0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          96
+        </td>
+        <td>
+          2907
+          -
+          2931
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          105
+        </td>
+        <td>
+          3124
+          -
+          3150
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          storeDefaults
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          99
+        </td>
+        <td>
+          2974
+          -
+          2997
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          keyToIndex
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

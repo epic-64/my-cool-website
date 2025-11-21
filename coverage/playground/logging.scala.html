@@ -1,0 +1,643 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/logging.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground
+</span>2 <span style=''>
+</span>3 <span style=''>trait Logger:
+</span>4 <span style=''>  def debug(message: String): Unit
+</span>5 <span style=''>  def info(message: String): Unit
+</span>6 <span style=''>  def error(message: String): Unit
+</span>7 <span style=''>
+</span>8 <span style=''>class LiveConsoleLogger extends Logger:
+</span>9 <span style=''>  </span><span style='background: #F0ADAD'>def debug</span><span style=''>(message: String): Unit = </span><span style='background: #F0ADAD'>println(s&quot;[DEBUG] $message&quot;)</span><span style=''>
+</span>10 <span style=''>  </span><span style='background: #F0ADAD'>def info</span><span style=''>(message: String): Unit = </span><span style='background: #F0ADAD'>println(s&quot;[INFO]  $message&quot;)</span><span style=''>
+</span>11 <span style=''>  </span><span style='background: #F0ADAD'>def error</span><span style=''>(message: String): Unit = </span><span style='background: #F0ADAD'>println(s&quot;[ERROR] $message&quot;)</span><span style=''>
+</span>12 <span style=''>
+</span>13 <span style=''>class MemoryLogger extends Logger:
+</span>14 <span style=''>  import scala.collection.mutable.ListBuffer
+</span>15 <span style=''>  private val infos  = </span><span style='background: #AEF1AE'>ListBuffer.empty</span><span style=''>[String]
+</span>16 <span style=''>  private val errors = </span><span style='background: #AEF1AE'>ListBuffer.empty</span><span style=''>[String]
+</span>17 <span style=''>  private val debugs = </span><span style='background: #AEF1AE'>ListBuffer.empty</span><span style=''>[String]
+</span>18 <span style=''>
+</span>19 <span style=''>  </span><span style='background: #AEF1AE'>def debug</span><span style=''>(message: String): Unit = </span><span style='background: #AEF1AE'>debugs += message</span><span style=''>
+</span>20 <span style=''>  </span><span style='background: #F0ADAD'>def info</span><span style=''>(message: String): Unit = </span><span style='background: #F0ADAD'>infos += message</span><span style=''>
+</span>21 <span style=''>  </span><span style='background: #AEF1AE'>def error</span><span style=''>(message: String): Unit = </span><span style='background: #AEF1AE'>errors += message</span><span style=''>
+</span>22 <span style=''>
+</span>23 <span style=''>  </span><span style='background: #F0ADAD'>def debugMessages</span><span style=''>: List[String] = </span><span style='background: #F0ADAD'>debugs.toList</span><span style=''>
+</span>24 <span style=''>  </span><span style='background: #F0ADAD'>def infoMessages</span><span style=''>: List[String] = </span><span style='background: #F0ADAD'>infos.toList</span><span style=''>
+</span>25 <span style=''>  </span><span style='background: #AEF1AE'>def errorMessages</span><span style=''>: List[String] = </span><span style='background: #AEF1AE'>errors.toList</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          537
+        </td>
+        <td>
+          216
+          -
+          244
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;[DEBUG] $message&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          539
+        </td>
+        <td>
+          181
+          -
+          190
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          debug
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def debug
+        </td>
+      </tr><tr>
+        <td>
+          9
+        </td>
+        <td>
+          538
+        </td>
+        <td>
+          224
+          -
+          243
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;[DEBUG] $message&quot;
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          541
+        </td>
+        <td>
+          289
+          -
+          308
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;[INFO]  $message&quot;
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          540
+        </td>
+        <td>
+          281
+          -
+          309
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;[INFO]  $message&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          10
+        </td>
+        <td>
+          542
+        </td>
+        <td>
+          247
+          -
+          255
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          info
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def info
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          543
+        </td>
+        <td>
+          347
+          -
+          375
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;[ERROR] $message&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          545
+        </td>
+        <td>
+          312
+          -
+          321
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          error
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def error
+        </td>
+      </tr><tr>
+        <td>
+          11
+        </td>
+        <td>
+          544
+        </td>
+        <td>
+          355
+          -
+          374
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;[ERROR] $message&quot;
+        </td>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          546
+        </td>
+        <td>
+          480
+          -
+          496
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          empty
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          ListBuffer.empty
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          547
+        </td>
+        <td>
+          528
+          -
+          544
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          empty
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          ListBuffer.empty
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          548
+        </td>
+        <td>
+          576
+          -
+          592
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          empty
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          ListBuffer.empty
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          550
+        </td>
+        <td>
+          604
+          -
+          613
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          debug
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          def debug
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          549
+        </td>
+        <td>
+          639
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          +=
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          debugs += message
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          552
+        </td>
+        <td>
+          659
+          -
+          667
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          info
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def info
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          551
+        </td>
+        <td>
+          693
+          -
+          709
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          +=
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          infos += message
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          554
+        </td>
+        <td>
+          712
+          -
+          721
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          error
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          def error
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          553
+        </td>
+        <td>
+          747
+          -
+          764
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          +=
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          errors += message
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          555
+        </td>
+        <td>
+          802
+          -
+          815
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toList
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          debugs.toList
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          556
+        </td>
+        <td>
+          768
+          -
+          785
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          debugMessages
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def debugMessages
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          558
+        </td>
+        <td>
+          818
+          -
+          834
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          infoMessages
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def infoMessages
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          557
+        </td>
+        <td>
+          851
+          -
+          863
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toList
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          infos.toList
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          559
+        </td>
+        <td>
+          900
+          -
+          913
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toList
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          errors.toList
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          560
+        </td>
+        <td>
+          866
+          -
+          883
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          errorMessages
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          def errorMessages
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

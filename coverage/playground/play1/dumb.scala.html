@@ -1,0 +1,337 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/play1/dumb.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground.play1
+</span>2 <span style=''>
+</span>3 <span style=''>import scala.util.Try
+</span>4 <span style=''>
+</span>5 <span style=''></span><span style='background: #F0ADAD'>@main def dumb</span><span style=''> =
+</span>6 <span style=''>  </span><span style='background: #F0ADAD'>Try(None.get).recover{ case e =&gt; e.printStackTrace() }</span><span style=''>
+</span>7 <span style=''>  </span><span style='background: #F0ADAD'>Try(List().head).recover{ case e =&gt; e.printStackTrace() }</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          5
+        </td>
+        <td>
+          572
+        </td>
+        <td>
+          49
+          -
+          63
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          dumb
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          @main def dumb
+        </td>
+      </tr><tr>
+        <td>
+          6
+        </td>
+        <td>
+          561
+        </td>
+        <td>
+          68
+          -
+          122
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          recover
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(None.get).recover{ case e =&gt; e.printStackTrace() }
+        </td>
+      </tr><tr>
+        <td>
+          6
+        </td>
+        <td>
+          564
+        </td>
+        <td>
+          101
+          -
+          120
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          printStackTrace
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.printStackTrace()
+        </td>
+      </tr><tr>
+        <td>
+          6
+        </td>
+        <td>
+          563
+        </td>
+        <td>
+          72
+          -
+          80
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          None.get
+        </td>
+      </tr><tr>
+        <td>
+          6
+        </td>
+        <td>
+          562
+        </td>
+        <td>
+          68
+          -
+          81
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(None.get)
+        </td>
+      </tr><tr>
+        <td>
+          6
+        </td>
+        <td>
+          565
+        </td>
+        <td>
+          98
+          -
+          120
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; e.printStackTrace()
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          568
+        </td>
+        <td>
+          129
+          -
+          135
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List()
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          567
+        </td>
+        <td>
+          125
+          -
+          141
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(List().head)
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          570
+        </td>
+        <td>
+          161
+          -
+          180
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          printStackTrace
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.printStackTrace()
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          566
+        </td>
+        <td>
+          125
+          -
+          182
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          recover
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(List().head).recover{ case e =&gt; e.printStackTrace() }
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          569
+        </td>
+        <td>
+          129
+          -
+          140
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          head
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          List().head
+        </td>
+      </tr><tr>
+        <td>
+          7
+        </td>
+        <td>
+          571
+        </td>
+        <td>
+          158
+          -
+          180
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; e.printStackTrace()
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>
