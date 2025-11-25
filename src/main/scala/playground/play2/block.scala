@@ -32,20 +32,23 @@ object TenantStore:
   def addVerified(tenant: Tenant[VerificationState.Verified]): Unit =
     verifiedTenants.put(tenant.id, tenant)
 
-  def getUnverifiedById(id: String): Option[Tenant[VerificationState.Unverified]] =
-    unverifiedTenants.get(id)
+  def getUnverifiedById(id: String): Try[Tenant[VerificationState.Unverified]] =
+    unverifiedTenants.get(id) match
+      case Some(tenant) => Success(tenant)
+      case None         => Failure(new NoSuchElementException(s"Unverified tenant with id '$id' not found"))
 
-  def getVerifiedById(id: String): Option[Tenant[VerificationState.Verified]] =
-    verifiedTenants.get(id)
+  def getVerifiedById(id: String): Try[Tenant[VerificationState.Verified]] =
+    verifiedTenants.get(id) match
+      case Some(tenant) => Success(tenant)
+      case None         => Failure(new NoSuchElementException(s"Verified tenant with id '$id' not found"))
 
 inline def withLogging[A](block: => A): A =
   println("start")
   block
 
-def processTenant[S <: VerificationState](tenant: Tenant[S]): Try[String] =
-  println(s"Processing tenant ${tenant.name}...")
-  println("Woooo scary side effects!")
-  Success(s"Processed tenant ${tenant.name}...")
+def summarize(tenant: Tenant[VerificationState.Verified]): Try[String] =
+  Success:
+    s"Tenant ${tenant.name} is verified as of ${tenant.status.asInstanceOf[TenantStatus.Verified].date}."
 
 // Compile-time proof: can only verify unverified tenants!
 def verifyTenant(tenant: Tenant[VerificationState.Unverified]): Try[Tenant[VerificationState.Verified]] =
@@ -67,9 +70,9 @@ def err[A](context: String)(block: => Try[A]): Try[A] =
 
   val result = for
     x <- err("Fetching input failed")(fetchInput())
-    x <- err("Fetching unverified Tenant failed")(Try(TenantStore.getUnverifiedById(x).get))
+    x <- err("Fetching unverified Tenant failed")(TenantStore.getUnverifiedById(x))
     x <- err("Tenant verification failed")(verifyTenant(x))
-    x <- err("Processing verified Tenant failed")(processTenant(x))
+    x <- err("Summary failed")(summarize(x))
   yield x
 
   result.recover(e => s"Error: ${e.getMessage}").foreach(println)
