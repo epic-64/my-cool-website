@@ -1,0 +1,5655 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/ContractModel.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground
+</span>2 <span style=''>
+</span>3 <span style=''>import ContractModelRW.statefulContractDtoRW
+</span>4 <span style=''>import ContractState.*
+</span>5 <span style=''>import upickle.default.ReadWriter.join
+</span>6 <span style=''>import upickle.default.{ReadWriter, macroRW}
+</span>7 <span style=''>
+</span>8 <span style=''>import java.time.Instant
+</span>9 <span style=''>import scala.util.Try
+</span>10 <span style=''>
+</span>11 <span style=''>case class StatefulContract[S &lt;: ContractState](
+</span>12 <span style=''>  id: String,
+</span>13 <span style=''>  party1: String,
+</span>14 <span style=''>  party2: String,
+</span>15 <span style=''>  party1Signature: Option[Instant],
+</span>16 <span style=''>  party2Signature: Option[Instant],
+</span>17 <span style=''>  state: S
+</span>18 <span style=''>):
+</span>19 <span style=''>  </span><span style='background: #F0ADAD'>def save</span><span style=''>(): Try[StatefulContract[S]] =
+</span>20 <span style=''>    </span><span style='background: #F0ADAD'>playground.ContractPersistence.save(this).map(_ =&gt; this)</span><span style=''>
+</span>21 <span style=''>
+</span>22 <span style=''>  </span><span style='background: #F0ADAD'>def sendEmail</span><span style=''>(recipient: Str</span><span style='background: #F0ADAD'>ing, messa</span><span style=''>ge: String)(using ev: S =:= FullySigned.type): Try[Uni</span><span style='background: #F0ADAD'>t] = Try:
+</span>23 <span style=''></span><span style='background: #F0ADAD'>    println(s&quot;Sending email to $recipient: $message&quot;)</span><span style=''>
+</span>24 <span style=''>
+</span>25 <span style=''>  </span><span style='background: #F0ADAD'>def signByParty1</span><span style=''>()(using ev: S =:= Unsigned.type): Try[StatefulContract[Party1Signed.type]] =
+</span>26 <span style=''>    </span><span style='background: #F0ADAD'>this.copy(party1Signature = Some(Instant.now), state = Party1Signed)
+</span>27 <span style=''></span><span style='background: #F0ADAD'>      .asInstanceOf[StatefulContract[Party1Signed.type]]
+</span>28 <span style=''></span><span style='background: #F0ADAD'>      .save()</span><span style=''>
+</span>29 <span style=''>
+</span>30 <span style=''>  </span><span style='background: #F0ADAD'>def signByParty2</span><span style=''>()(using ev: S =:= Party1Signed.type): Try[StatefulContract[FullySigned.type]] =
+</span>31 <span style=''>    </span><span style='background: #F0ADAD'>this.copy(party2Signature = Some(Instant.now), state = FullySigned)
+</span>32 <span style=''></span><span style='background: #F0ADAD'>      .asInstanceOf[StatefulContract[FullySigned.type]]
+</span>33 <span style=''></span><span style='background: #F0ADAD'>      .save()</span><span style=''>
+</span>34 <span style=''>
+</span>35 <span style=''>object StatefulContract:
+</span>36 <span style=''>  </span><span style='background: #F0ADAD'>private def fromContract</span><span style=''>[S &lt;: ContractState](contract: Contract[S], party1Sig: Option[Instant], party2Sig: Option[Instant], state: S): StatefulContract[S] =
+</span>37 <span style=''>    StatefulContract(contract.id, contract.party1, contract.party2, party1Sig, party2Sig, state)
+</span>38 <span style=''>
+</span>39 <span style=''>  </span><span style='background: #F0ADAD'>def toContract</span><span style=''>(sc: StatefulContract[? &lt;: ContractState]): Option[Contract[? &lt;: ContractState]] =
+</span>40 <span style=''>    sc.state match
+</span>41 <span style=''>      case Unsigned </span><span style='background: #F0ADAD'>=&gt; Some(Contract[Unsigned.type](sc.id, sc.party1, sc.party2))</span><span style=''>
+</span>42 <span style=''>      case Party1Signed </span><span style='background: #F0ADAD'>=&gt; Some(Contract[Party1Signed.type](sc.id, sc.party1, sc.party2))</span><span style=''>
+</span>43 <span style=''>      case FullySigned </span><span style='background: #F0ADAD'>=&gt; Some(Contract[FullySigned.type](sc.id, sc.party1, sc.party2))</span><span style=''>
+</span>44 <span style=''>
+</span>45 <span style=''>// For serialization, we need an untyped version
+</span>46 <span style=''>case class StatefulContractDto(
+</span>47 <span style=''>  id: String,
+</span>48 <span style=''>  party1: String,
+</span>49 <span style=''>  party2: String,
+</span>50 <span style=''>  party1Signature: Option[Instant],
+</span>51 <span style=''>  party2Signature: Option[Instant],
+</span>52 <span style=''>  state: ContractState
+</span>53 <span style=''>):
+</span>54 <span style=''>  </span><span style='background: #F0ADAD'>def asUnsigned</span><span style=''>(): Try[StatefulContract[Unsigned.type]] = </span><span style='background: #F0ADAD'>Try:
+</span>55 <span style=''></span><span style='background: #F0ADAD'>    state match
+</span>56 <span style=''></span><span style='background: #F0ADAD'>      case Unsigned =&gt; StatefulContract[Unsigned.type](id, party1, party2, party1Signature, party2Signature, Unsigned)
+</span>57 <span style=''></span><span style='background: #F0ADAD'>      case _ =&gt; throw new Exception(s&quot;Invalid state for Unsigned: $state&quot;)</span><span style=''>
+</span>58 <span style=''>
+</span>59 <span style=''>  </span><span style='background: #F0ADAD'>def asParty1Signed</span><span style=''>(): Try[StatefulContract[Party1Signed.type]] = </span><span style='background: #F0ADAD'>Try:
+</span>60 <span style=''></span><span style='background: #F0ADAD'>    state match
+</span>61 <span style=''></span><span style='background: #F0ADAD'>      case Party1Signed =&gt; StatefulContract[Party1Signed.type](id, party1, party2, party1Signature, party2Signature, Party1Signed)
+</span>62 <span style=''></span><span style='background: #F0ADAD'>      case _ =&gt; throw new Exception(s&quot;Invalid state for Party1Signed: $state&quot;)</span><span style=''>
+</span>63 <span style=''>
+</span>64 <span style=''>  </span><span style='background: #F0ADAD'>def asFullySigned</span><span style=''>(): Try[StatefulContract[FullySigned.type]] = </span><span style='background: #F0ADAD'>Try:
+</span>65 <span style=''></span><span style='background: #F0ADAD'>    state match
+</span>66 <span style=''></span><span style='background: #F0ADAD'>      case FullySigned =&gt; StatefulContract[FullySigned.type](id, party1, party2, party1Signature, party2Signature, FullySigned)
+</span>67 <span style=''></span><span style='background: #F0ADAD'>      case _ =&gt; throw new Exception(s&quot;Invalid state for FullySigned: $state&quot;)</span><span style=''>
+</span>68 <span style=''></span><span style='background: #F0ADAD'>
+</span>69 <span style=''></span><span style='background: #F0ADAD'>  def toJson: String = upickle.default.write(this)</span><span style=''>
+</span>70 <span style=''>
+</span>71 <span style=''>  </span><span style='background: #F0ADAD'>def asTyped</span><span style=''>(</span><span style='background: #F0ADAD'>): Try[StatefulContract</span><span style=''>[? &lt;: ContractState]] = state match
+</span>72 <span style=''>    case Unsign</span><span style='background: #F0ADAD'>ed =&gt; asUnsigned()
+</span>73 <span style=''></span><span style='background: #F0ADAD'>    ca</span><span style=''>se Party1Signed </span><span style='background: #F0ADAD'>=&gt; asParty1Signed()</span><span style=''>
+</span>74 <span style=''>    case FullyS</span><span style='background: #F0ADAD'>igned =&gt; asFullySigned()
+</span>75 <span style=''></span><span style='background: #F0ADAD'>
+</span>76 <span style=''>object StatefulContractDto:
+</span>77 <span style=''>  </span><span style='background: #F0ADAD'>def fromStatefulContract</span><span style=''>[S &lt;: ContractState](sc: StatefulContract[S]): StatefulContractDto =
+</span>78 <span style=''>    StatefulContractDto(sc.id, sc.party1, sc.party2, sc.party1Signature, sc.party2Signature, sc.state)
+</span>79 <span style=''>
+</span>80 <span style=''>object ContractModelRW:
+</span>81 <span style=''>  implicit val instantRW: ReadWriter[Instant] = </span><span style='background: #F0ADAD'>upickle.default.readwriter[String].bimap[Instant](
+</span>82 <span style=''></span><span style='background: #F0ADAD'>    _.toString, Instant.parse
+</span>83 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span>84 <span style=''>  implicit val contractStateRW: ReadWriter[ContractState] = </span><span style='background: #F0ADAD'>upickle.default.readwriter[String].bimap[ContractState](
+</span>85 <span style=''></span><span style='background: #F0ADAD'>    _.toString, s =&gt; ContractState.valueOf(s)
+</span>86 <span style=''></span><span style='background: #F0ADAD'>  )</span><span style=''>
+</span>87 <span style=''>  implicit val statefulContractDtoRW: ReadWriter[StatefulContractDto] = </span><span style='background: #F0ADAD'>macroRW</span><span style=''>
+</span>88 <span style=''>
+</span>89 <span style=''>  </span><span style='background: #F0ADAD'>implicit def statefulContractRW</span><span style=''>[S &lt;: ContractState]: ReadWriter[StatefulContract[S]] =
+</span>90 <span style=''>    </span><span style='background: #F0ADAD'>statefulContractDtoRW.bimap[StatefulContract[S]](
+</span>91 <span style=''></span><span style='background: #F0ADAD'>      sc =&gt; StatefulContractDto(sc.id, sc.party1, sc.party2, sc.party1Signature, sc.party2Signature, sc.state),
+</span>92 <span style=''></span><span style='background: #F0ADAD'>      dto =&gt; dto.asTyped().asInstanceOf[StatefulContract[S]]
+</span>93 <span style=''></span><span style='background: #F0ADAD'>    )</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          233
+        </td>
+        <td>
+          408
+          -
+          416
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def save
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          232
+        </td>
+        <td>
+          451
+          -
+          492
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          playground.ContractPersistence.save(this)
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          456
+        </td>
+        <td>
+          493
+          -
+          503
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          map(_ =&gt; t
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          231
+        </td>
+        <td>
+          451
+          -
+          507
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          playground.ContractPersistence.save(this).map(_ =&gt; this)
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          348
+        </td>
+        <td>
+          539
+          -
+          549
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ing, messa
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          237
+        </td>
+        <td>
+          511
+          -
+          524
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def sendEmail
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          236
+        </td>
+        <td>
+          625
+          -
+          665
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Sending email to $recipient: $message&quot;
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          235
+        </td>
+        <td>
+          617
+          -
+          666
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Sending email to $recipient: $message&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          234
+        </td>
+        <td>
+          608
+          -
+          666
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    println(s&quot;Sending email to $recipient: $message&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          404
+        </td>
+        <td>
+          603
+          -
+          622
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          write0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          t] = Try:\n    print
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          240
+        </td>
+        <td>
+          670
+          -
+          686
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          signByParty1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def signByParty1
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          239
+        </td>
+        <td>
+          801
+          -
+          812
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          now
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Instant.now
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          238
+        </td>
+        <td>
+          768
+          -
+          907
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          this.copy(party1Signature = Some(Instant.now), state = Party1Signed)\n      .asInstanceOf[StatefulContract[Party1Signed.type]]\n      .save()
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          243
+        </td>
+        <td>
+          911
+          -
+          927
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          signByParty2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def signByParty2
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          454
+        </td>
+        <td>
+          1012
+          -
+          1029
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeToObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          this.copy(party2S
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          242
+        </td>
+        <td>
+          1045
+          -
+          1056
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          now
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Instant.now
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          241
+        </td>
+        <td>
+          1012
+          -
+          1149
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          this.copy(party2Signature = Some(Instant.now), state = FullySigned)\n      .asInstanceOf[StatefulContract[FullySigned.type]]\n      .save()
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          244
+        </td>
+        <td>
+          1178
+          -
+          1202
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          private def fromContract
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          248
+        </td>
+        <td>
+          1435
+          -
+          1449
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          toContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def toContract
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          245
+        </td>
+        <td>
+          1571
+          -
+          1632
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Some(Contract[Unsigned.type](sc.id, sc.party1, sc.party2))
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          246
+        </td>
+        <td>
+          1657
+          -
+          1722
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Some(Contract[Party1Signed.type](sc.id, sc.party1, sc.party2))
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          247
+        </td>
+        <td>
+          1746
+          -
+          1810
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Some(Contract[FullySigned.type](sc.id, sc.party1, sc.party2))
+        </td>
+      </tr><tr>
+        <td>
+          54
+        </td>
+        <td>
+          255
+        </td>
+        <td>
+          2043
+          -
+          2057
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          asUnsigned
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def asUnsigned
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          249
+        </td>
+        <td>
+          2100
+          -
+          2314
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    state match\n      case Unsigned =&gt; StatefulContract[Unsigned.type](id, party1, party2, party1Signature, party2Signature, Unsigned)\n      case _ =&gt; throw new Exception(s&quot;Invalid state for Unsigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          250
+        </td>
+        <td>
+          2141
+          -
+          2239
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; StatefulContract[Unsigned.type](id, party1, party2, party1Signature, party2Signature, Unsigned)
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          254
+        </td>
+        <td>
+          2253
+          -
+          2314
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; throw new Exception(s&quot;Invalid state for Unsigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          253
+        </td>
+        <td>
+          2276
+          -
+          2313
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Invalid state for Unsigned: $state&quot;
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          252
+        </td>
+        <td>
+          2262
+          -
+          2314
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new Exception(s&quot;Invalid state for Unsigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          251
+        </td>
+        <td>
+          2256
+          -
+          2314
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          throw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          throw new Exception(s&quot;Invalid state for Unsigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          59
+        </td>
+        <td>
+          262
+        </td>
+        <td>
+          2318
+          -
+          2336
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          asParty1Signed
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def asParty1Signed
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          256
+        </td>
+        <td>
+          2383
+          -
+          2613
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    state match\n      case Party1Signed =&gt; StatefulContract[Party1Signed.type](id, party1, party2, party1Signature, party2Signature, Party1Signed)\n      case _ =&gt; throw new Exception(s&quot;Invalid state for Party1Signed: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          61
+        </td>
+        <td>
+          257
+        </td>
+        <td>
+          2428
+          -
+          2534
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; StatefulContract[Party1Signed.type](id, party1, party2, party1Signature, party2Signature, Party1Signed)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          259
+        </td>
+        <td>
+          2557
+          -
+          2613
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new Exception(s&quot;Invalid state for Party1Signed: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          258
+        </td>
+        <td>
+          2551
+          -
+          2613
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          throw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          throw new Exception(s&quot;Invalid state for Party1Signed: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          261
+        </td>
+        <td>
+          2548
+          -
+          2613
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; throw new Exception(s&quot;Invalid state for Party1Signed: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          260
+        </td>
+        <td>
+          2571
+          -
+          2612
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Invalid state for Party1Signed: $state&quot;
+        </td>
+      </tr><tr>
+        <td>
+          64
+        </td>
+        <td>
+          269
+        </td>
+        <td>
+          2617
+          -
+          2634
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          asFullySigned
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def asFullySigned
+        </td>
+      </tr><tr>
+        <td>
+          65
+        </td>
+        <td>
+          263
+        </td>
+        <td>
+          2680
+          -
+          2906
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    state match\n      case FullySigned =&gt; StatefulContract[FullySigned.type](id, party1, party2, party1Signature, party2Signature, FullySigned)\n      case _ =&gt; throw new Exception(s&quot;Invalid state for FullySigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          330
+        </td>
+        <td>
+          2812
+          -
+          2834
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          visitors0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          re, FullySigned)\n     
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          264
+        </td>
+        <td>
+          2724
+          -
+          2828
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; StatefulContract[FullySigned.type](id, party1, party2, party1Signature, party2Signature, FullySigned)
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          265
+        </td>
+        <td>
+          2845
+          -
+          2906
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          throw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          throw new Exception(s&quot;Invalid state for FullySigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          268
+        </td>
+        <td>
+          2842
+          -
+          2906
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; throw new Exception(s&quot;Invalid state for FullySigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          267
+        </td>
+        <td>
+          2865
+          -
+          2905
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Invalid state for FullySigned: $state&quot;
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          266
+        </td>
+        <td>
+          2851
+          -
+          2906
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new Exception(s&quot;Invalid state for FullySigned: $state&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          271
+        </td>
+        <td>
+          2931
+          -
+          2952
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          write$default$2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.write
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          274
+        </td>
+        <td>
+          2910
+          -
+          2920
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          toJson
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def toJson
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          270
+        </td>
+        <td>
+          2931
+          -
+          2958
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          write
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.write(this)
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          273
+        </td>
+        <td>
+          2931
+          -
+          2952
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          write$default$4
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.write
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          332
+        </td>
+        <td>
+          2907
+          -
+          2931
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          \n  def toJson: String = 
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          272
+        </td>
+        <td>
+          2931
+          -
+          2952
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          write$default$3
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.write
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          340
+        </td>
+        <td>
+          2974
+          -
+          2997
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          keyToIndex
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ): Try[StatefulContract
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          281
+        </td>
+        <td>
+          2962
+          -
+          2973
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          asTyped
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def asTyped
+        </td>
+      </tr><tr>
+        <td>
+          72
+        </td>
+        <td>
+          345
+        </td>
+        <td>
+          3048
+          -
+          3073
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allKeysArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ed =&gt; asUnsigned()\n    ca
+        </td>
+      </tr><tr>
+        <td>
+          72
+        </td>
+        <td>
+          276
+        </td>
+        <td>
+          3051
+          -
+          3066
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; asUnsigned()
+        </td>
+      </tr><tr>
+        <td>
+          72
+        </td>
+        <td>
+          275
+        </td>
+        <td>
+          3054
+          -
+          3066
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          asUnsigned
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          asUnsigned()
+        </td>
+      </tr><tr>
+        <td>
+          73
+        </td>
+        <td>
+          277
+        </td>
+        <td>
+          3092
+          -
+          3108
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          asParty1Signed
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          asParty1Signed()
+        </td>
+      </tr><tr>
+        <td>
+          73
+        </td>
+        <td>
+          278
+        </td>
+        <td>
+          3089
+          -
+          3108
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; asParty1Signed()
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          346
+        </td>
+        <td>
+          3124
+          -
+          3150
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          storeDefaults
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          igned =&gt; asFullySigned()\n\n
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          280
+        </td>
+        <td>
+          3130
+          -
+          3148
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; asFullySigned()
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          279
+        </td>
+        <td>
+          3133
+          -
+          3148
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          asFullySigned
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          asFullySigned()
+        </td>
+      </tr><tr>
+        <td>
+          77
+        </td>
+        <td>
+          282
+        </td>
+        <td>
+          3180
+          -
+          3204
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromStatefulContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def fromStatefulContract
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          283
+        </td>
+        <td>
+          3449
+          -
+          3533
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          bimap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.readwriter[String].bimap[Instant](\n    _.toString, Instant.parse\n  )
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          284
+        </td>
+        <td>
+          3449
+          -
+          3483
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readwriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.readwriter[String]
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          286
+        </td>
+        <td>
+          3516
+          -
+          3529
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          parse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Instant.parse
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          285
+        </td>
+        <td>
+          3504
+          -
+          3514
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _.toString
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          288
+        </td>
+        <td>
+          3594
+          -
+          3628
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readwriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.readwriter[String]
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          287
+        </td>
+        <td>
+          3594
+          -
+          3700
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          bimap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          upickle.default.readwriter[String].bimap[ContractState](\n    _.toString, s =&gt; ContractState.valueOf(s)\n  )
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          433
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          442
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          424
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          451
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          406
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          415
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          436
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          445
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          391
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          427
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          409
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          418
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          364
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          373
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          400
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          382
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          355
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          367
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          394
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          403
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          376
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          349
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          358
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          430
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          331
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          304
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          421
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          295
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          448
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          457
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          412
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          439
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          313
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          322
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          385
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          307
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          388
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          397
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          298
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          370
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          343
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          379
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          352
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          325
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          361
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          334
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          316
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          289
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          319
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          301
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          337
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          292
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          allowUnknownKeys
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          328
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          310
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          438
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          447
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          420
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          429
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          369
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          441
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          387
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          432
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          414
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          450
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          423
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          396
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          405
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          378
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          360
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          426
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          399
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          408
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          300
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          381
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          354
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          390
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          336
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          372
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          453
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          363
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          435
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          444
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          417
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          309
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          318
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          327
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          357
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          312
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          393
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          402
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitEnd
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          294
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          303
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          375
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          384
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          411
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          366
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          339
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          321
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          306
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          333
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          342
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          324
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          297
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          351
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          315
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          443
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          452
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          291
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          headOption
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          437
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          383
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          392
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          419
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          446
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          455
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          428
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          401
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          410
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          431
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          386
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          395
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          341
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          422
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          377
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          413
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          359
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          368
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          440
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          449
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          350
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          323
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          389
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          362
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          344
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          317
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          353
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          425
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          434
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          326
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          299
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          335
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          308
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          380
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionReader
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          416
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          290
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          371
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          398
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          407
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          356
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          338
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          374
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          347
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          320
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          329
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          OptionWriter
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          302
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          311
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          293
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          365
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          314
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          296
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          305
+        </td>
+        <td>
+          3773
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          89
+        </td>
+        <td>
+          460
+        </td>
+        <td>
+          3784
+          -
+          3815
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          statefulContractRW
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          implicit def statefulContractRW
+        </td>
+      </tr><tr>
+        <td>
+          90
+        </td>
+        <td>
+          458
+        </td>
+        <td>
+          3875
+          -
+          4103
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          bimap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          statefulContractDtoRW.bimap[StatefulContract[S]](\n      sc =&gt; StatefulContractDto(sc.id, sc.party1, sc.party2, sc.party1Signature, sc.party2Signature, sc.state),\n      dto =&gt; dto.asTyped().asInstanceOf[StatefulContract[S]]\n    )
+        </td>
+      </tr><tr>
+        <td>
+          92
+        </td>
+        <td>
+          459
+        </td>
+        <td>
+          4050
+          -
+          4063
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          asTyped
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          dto.asTyped()
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

@@ -1,0 +1,1912 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/TapirRoutes.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground
+</span>2 <span style=''>
+</span>3 <span style=''>import sttp.tapir._
+</span>4 <span style=''>import sttp.tapir.server.pekkohttp.PekkoHttpServerInterpreter
+</span>5 <span style=''>import org.apache.pekko.http.scaladsl.server.Route
+</span>6 <span style=''>import scala.concurrent.{Future, ExecutionContext}
+</span>7 <span style=''>import upickle.default.{ReadWriter, macroRW}
+</span>8 <span style=''>import sttp.tapir.json.upickle._
+</span>9 <span style=''>import sttp.tapir.generic.auto._
+</span>10 <span style=''>
+</span>11 <span style=''>object TapirRoutes {
+</span>12 <span style=''>  // Simple endpoint: GET /weather returns a string
+</span>13 <span style=''>  val weatherEndpoint: PublicEndpoint[Unit, Unit, String, Any] =
+</span>14 <span style=''>    </span><span style='background: #F0ADAD'>endpoint.get.in(&quot;weather&quot;).out(stringBody)
+</span>15 <span style=''></span><span style='background: #F0ADAD'>
+</span>16 <span style=''></span><span style='background: #F0ADAD'> </span><span style=''> // Requires an implicit/given Execu</span><span style='background: #F0ADAD'>tionContex</span><span style=''>t (provided by ActorSystem in HelloWorldServer)
+</span>17 <span style=''>  </span><span style='background: #F0ADAD'>def weatherRoute(using </span><span style=''>ec: ExecutionContext): Route =
+</span>18 <span style=''>    </span><span style='background: #F0ADAD'>PekkoHttpServerInterpreter().toRoute(weatherEndpoint.serverLogicSuccess { _ =&gt;
+</span>19 <span style=''></span><span style='background: #F0ADAD'>      Future.successful(&quot;The weather is sunny!&quot;)
+</span>20 <span style=''></span><span style='background: #F0ADAD'>    })</span><span style=''>
+</span>21 <span style=''>
+</span>22 <span style=''>  final case class WeatherResponse(city: String, description: String, tempC: Double)
+</span>23 <span style=''>  object WeatherResponse { implicit val rw: ReadWriter[WeatherResponse] = </span><span style='background: #F0ADAD'>macroRW</span><span style=''> }
+</span>24 <span style=''>
+</span>25 <span style=''>  // Endpoint: GET /weather/{city}?units=metric|i</span><span style='background: #F0ADAD'>mperial returns J</span><span style=''>SON weather payload
+</span>26 <span style=''>  val weatherByCityEndpoint: PublicEndpoint[(String, Option[String]), Unit, WeatherResponse, Any] =
+</span>27 <span style=''>    </span><span style='background: #F0ADAD'>endpoint.get
+</span>28 <span style=''></span><span style='background: #F0ADAD'>      .in(&quot;weather&quot; / path[String](&quot;city&quot;))
+</span>29 <span style=''></span><span style='background: #F0ADAD'>      .in(query[Option[String]](&quot;units&quot;))
+</span>30 <span style=''></span><span style='background: #F0ADAD'>      .out(jsonBody[WeatherResponse])</span><span style=''>
+</span>31 <span style=''>
+</span>32 <span style=''>  </span><span style='background: #F0ADAD'>def weatherByCityRoute</span><span style=''>(using ec: ExecutionContext): Route =
+</span>33 <span style=''>    </span><span style='background: #F0ADAD'>PekkoHttpServerInterpreter().toRoute(weatherByCityEndpoint.serverLogicSuccess { case (city, unitsOpt) =&gt;
+</span>34 <span style=''></span><span style='background: #F0ADAD'>      // Simple fake temperature conversion for demo
+</span>35 <span style=''></span><span style='background: #F0ADAD'>      val tempC = if unitsOpt.contains(&quot;imperial&quot;) then 75.0 else 24.0
+</span>36 <span style=''></span><span style='background: #F0ADAD'>      Future.successful(WeatherResponse(city, s&quot;Sunny in $city&quot;, tempC))
+</span>37 <span style=''></span><span style='background: #F0ADAD'>    })</span><span style=''>
+</span>38 <span style=''>
+</span>39 <span style=''>  // Aggregate Tapir routes here to expose multiple endpoints easily
+</span>40 <span style=''>  </span><span style='background: #F0ADAD'>def allTapirRoutes</span><span style=''>(using ec: ExecutionContext): Route =
+</span>41 <span style=''>    import org.apache.pekko.http.scaladsl.server.Directives.concat
+</span>42 <span style=''>    </span><span style='background: #F0ADAD'>concat(
+</span>43 <span style=''></span><span style='background: #F0ADAD'>      weatherRoute,
+</span>44 <span style=''></span><span style='background: #F0ADAD'>      weatherByCityRoute,
+</span>45 <span style=''></span><span style='background: #F0ADAD'>    )</span><span style=''>
+</span>46 <span style=''>}
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          463
+        </td>
+        <td>
+          458
+          -
+          470
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          465
+        </td>
+        <td>
+          489
+          -
+          499
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          stringBody
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          stringBody
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          462
+        </td>
+        <td>
+          458
+          -
+          484
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          in
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get.in(&quot;weather&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          512
+        </td>
+        <td>
+          493
+          -
+          503
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ngBody)\n\n 
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          461
+        </td>
+        <td>
+          458
+          -
+          500
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          out
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get.in(&quot;weather&quot;).out(stringBody)
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          464
+        </td>
+        <td>
+          474
+          -
+          483
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          stringToPath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;weather&quot;
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          490
+        </td>
+        <td>
+          539
+          -
+          549
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          tionContex
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          503
+        </td>
+        <td>
+          603
+          -
+          622
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          write0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          weatherRoute(using 
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          470
+        </td>
+        <td>
+          599
+          -
+          615
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          weatherRoute
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def weatherRoute
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          468
+        </td>
+        <td>
+          694
+          -
+          790
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          serverLogicSuccess
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          weatherEndpoint.serverLogicSuccess { _ =&gt;\n      Future.successful(&quot;The weather is sunny!&quot;)\n    }
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          467
+        </td>
+        <td>
+          657
+          -
+          685
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          PekkoHttpServerInterpreter()
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          466
+        </td>
+        <td>
+          657
+          -
+          791
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toRoute
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          PekkoHttpServerInterpreter().toRoute(weatherEndpoint.serverLogicSuccess { _ =&gt;\n      Future.successful(&quot;The weather is sunny!&quot;)\n    })
+        </td>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          469
+        </td>
+        <td>
+          742
+          -
+          784
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          successful
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Future.successful(&quot;The weather is sunny!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          496
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          478
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          505
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          472
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          508
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          499
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          481
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          480
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          498
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          507
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          489
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          474
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          allowUnknownKeys
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          483
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          492
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          501
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitEnd
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          513
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          495
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          504
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          486
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          471
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          497
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          479
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          506
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          509
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          500
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          473
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          headOption
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          491
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          485
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          494
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          476
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          511
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          493
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          502
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          484
+        </td>
+        <td>
+          952
+          -
+          959
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          510
+        </td>
+        <td>
+          1012
+          -
+          1029
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeToObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          mperial returns J
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          514
+        </td>
+        <td>
+          1153
+          -
+          1289
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          out
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get\n      .in(&quot;weather&quot; / path[String](&quot;city&quot;))\n      .in(query[Option[String]](&quot;units&quot;))\n      .out(jsonBody[WeatherResponse])
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          517
+        </td>
+        <td>
+          1153
+          -
+          1165
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          516
+        </td>
+        <td>
+          1153
+          -
+          1209
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          in
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get\n      .in(&quot;weather&quot; / path[String](&quot;city&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          515
+        </td>
+        <td>
+          1153
+          -
+          1251
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          in
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint.get\n      .in(&quot;weather&quot; / path[String](&quot;city&quot;))\n      .in(query[Option[String]](&quot;units&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          519
+        </td>
+        <td>
+          1176
+          -
+          1185
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          stringToPath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;weather&quot;
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          518
+        </td>
+        <td>
+          1176
+          -
+          1208
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          /
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          &quot;weather&quot; / path[String](&quot;city&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          520
+        </td>
+        <td>
+          1188
+          -
+          1208
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          path
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          path[String](&quot;city&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          521
+        </td>
+        <td>
+          1220
+          -
+          1250
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          query
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          query[Option[String]](&quot;units&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          522
+        </td>
+        <td>
+          1263
+          -
+          1288
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          jsonBody
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          jsonBody[WeatherResponse]
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          532
+        </td>
+        <td>
+          1293
+          -
+          1315
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          weatherByCityRoute
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def weatherByCityRoute
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          523
+        </td>
+        <td>
+          1357
+          -
+          1665
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toRoute
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          PekkoHttpServerInterpreter().toRoute(weatherByCityEndpoint.serverLogicSuccess { case (city, unitsOpt) =&gt;\n      // Simple fake temperature conversion for demo\n      val tempC = if unitsOpt.contains(&quot;imperial&quot;) then 75.0 else 24.0\n      Future.successful(WeatherResponse(city, s&quot;Sunny in $city&quot;, tempC))\n    })
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          525
+        </td>
+        <td>
+          1394
+          -
+          1664
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          serverLogicSuccess
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          weatherByCityEndpoint.serverLogicSuccess { case (city, unitsOpt) =&gt;\n      // Simple fake temperature conversion for demo\n      val tempC = if unitsOpt.contains(&quot;imperial&quot;) then 75.0 else 24.0\n      Future.successful(WeatherResponse(city, s&quot;Sunny in $city&quot;, tempC))\n    }
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          531
+        </td>
+        <td>
+          1459
+          -
+          1658
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt;\n      // Simple fake temperature conversion for demo\n      val tempC = if unitsOpt.contains(&quot;imperial&quot;) then 75.0 else 24.0\n      Future.successful(WeatherResponse(city, s&quot;Sunny in $city&quot;, tempC))
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          524
+        </td>
+        <td>
+          1357
+          -
+          1385
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          PekkoHttpServerInterpreter()
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          528
+        </td>
+        <td>
+          1581
+          -
+          1585
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          24.0
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          527
+        </td>
+        <td>
+          1571
+          -
+          1575
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          75.0
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          526
+        </td>
+        <td>
+          1536
+          -
+          1565
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          contains
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          unitsOpt.contains(&quot;imperial&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          530
+        </td>
+        <td>
+          1632
+          -
+          1649
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Sunny in $city&quot;
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          529
+        </td>
+        <td>
+          1592
+          -
+          1658
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          successful
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Future.successful(WeatherResponse(city, s&quot;Sunny in $city&quot;, tempC))
+        </td>
+      </tr><tr>
+        <td>
+          40
+        </td>
+        <td>
+          536
+        </td>
+        <td>
+          1738
+          -
+          1756
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allTapirRoutes
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def allTapirRoutes
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          533
+        </td>
+        <td>
+          1865
+          -
+          1924
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          concat
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          concat(\n      weatherRoute,\n      weatherByCityRoute,\n    )
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          534
+        </td>
+        <td>
+          1879
+          -
+          1891
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          weatherRoute
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          weatherRoute
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          535
+        </td>
+        <td>
+          1899
+          -
+          1917
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          weatherByCityRoute
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          weatherByCityRoute
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          487
+        </td>
+        <td>
+          3048
+          -
+          3073
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allKeysArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          477
+        </td>
+        <td>
+          2907
+          -
+          2931
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          488
+        </td>
+        <td>
+          3124
+          -
+          3150
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          storeDefaults
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          482
+        </td>
+        <td>
+          2974
+          -
+          2997
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          keyToIndex
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          475
+        </td>
+        <td>
+          2812
+          -
+          2834
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          visitors0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

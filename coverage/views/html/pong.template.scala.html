@@ -1,0 +1,448 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          views/html/pong.template.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>
+</span>2 <span style=''>package views.html
+</span>3 <span style=''>
+</span>4 <span style=''>import _root_.play.twirl.api.TwirlFeatureImports.*
+</span>5 <span style=''>import _root_.play.twirl.api.TwirlHelperImports.*
+</span>6 <span style=''>import scala.language.adhocExtensions
+</span>7 <span style=''>import _root_.play.twirl.api.Html
+</span>8 <span style=''>import _root_.play.twirl.api.JavaScript
+</span>9 <span style=''>import _root_.play.twirl.api.Txt
+</span>10 <span style=''>import _root_.play.twirl.api.Xml
+</span>11 <span style=''>
+</span>12 <span style=''>object pong extends _root_.play.twirl.api.BaseScalaTemplate[play.twirl.api.HtmlFormat.Appendable,_root_.play.twirl.api.Format[play.twirl.api.HtmlFormat.Appendable]](play.twirl.api.HtmlFormat) with _root_.play.twirl.api.Template2[String,String,play.twirl.api.HtmlFormat.Appendable] {
+</span>13 <span style=''>
+</span>14 <span style=''>  /**/
+</span>15 <span style=''>  </span><span style='background: #F0ADAD'>def apply</span><span style=''>/*1.2*/(emoji: String, color: String):play.twirl.api.HtmlFormat.Appendable = {
+</span>16 <span style=''>    </span><span style='background: #F0ADAD'>_display_ {
+</span>17 <span style=''></span><span style='background: #F0ADAD'>      {
+</span>18 <span style=''></span><span style='background: #F0ADAD'>
+</span>19 <span style=''></span><span style='background: #F0ADAD'>
+</span>20 <span style=''></span><span style='background: #F0ADAD'>Seq[Any](format.raw/*2.1*/(&quot;&quot;&quot;
+</span>21 <span style=''></span><span style='background: #F0ADAD'>&quot;&quot;&quot;),format.raw/*3.1*/(&quot;&quot;&quot;&lt;div class=&quot;pong-box&quot; style=&quot;background-color: &quot;&quot;&quot;),_display_(/*3.49*/color),format.raw/*3.54*/(&quot;&quot;&quot;&quot;&gt;
+</span>22 <span style=''></span><span style='background: #F0ADAD'>    &quot;&quot;&quot;),_display_(/*4.6*/emoji),format.raw/*4.11*/(&quot;&quot;&quot; &quot;&quot;&quot;),format.raw/*4.12*/(&quot;&quot;&quot;Pong!
+</span>23 <span style=''></span><span style='background: #F0ADAD'>&lt;/div&gt;
+</span>24 <span style=''></span><span style='background: #F0ADAD'>&quot;&quot;&quot;))
+</span>25 <span style=''></span><span style='background: #F0ADAD'>      }
+</span>26 <span style=''></span><span style='background: #F0ADAD'>    }</span><span style=''>
+</span>27 <span style=''>  }
+</span>28 <span style=''>
+</span>29 <span style=''>  </span><span style='background: #F0ADAD'>def render</span><span style=''>(emoji:String,color:String): play.twirl.api.HtmlFormat.Appendable = </span><span style='background: #F0ADAD'>apply(emoji,color)</span><span style=''>
+</span>30 <span style=''>
+</span>31 <span style=''>  </span><span style='background: #F0ADAD'>def f</span><span style=''>:((String,String) =&gt; play.twirl.api.HtmlFormat.Appendable) = (emoji,color) =&gt; </span><span style='background: #F0ADAD'>apply(emoji,color)</span><span style=''>
+</span>32 <span style=''>
+</span>33 <span style=''>  </span><span style='background: #F0ADAD'>def ref</span><span style=''>: this.type = this
+</span>34 <span style=''>
+</span>35 <span style=''>}
+</span>36 <span style=''>
+</span>37 <span style=''>
+</span>38 <span style=''>              /*
+</span>39 <span style=''>                  -- GENERATED --
+</span>40 <span style=''>                  SOURCE: src/main/twirl/views/pong.scala.html
+</span>41 <span style=''>                  HASH: bb47a659719d720788c5117a16ac15fd58fd1456
+</span>42 <span style=''>                  MATRIX: 610-&gt;1|734-&gt;32|761-&gt;33|835-&gt;81|860-&gt;86|893-&gt;94|918-&gt;99|946-&gt;100
+</span>43 <span style=''>                  LINES: 15-&gt;1|20-&gt;2|21-&gt;3|21-&gt;3|21-&gt;3|22-&gt;4|22-&gt;4|22-&gt;4
+</span>44 <span style=''>                  -- GENERATED --
+</span>45 <span style=''>              */
+</span>46 <span style=''>          
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          985
+        </td>
+        <td>
+          594
+          -
+          603
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def apply
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          976
+        </td>
+        <td>
+          686
+          -
+          982
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_ {\n      {\n\n\nSeq[Any](format.raw/*2.1*/(&quot;&quot;&quot;\n&quot;&quot;&quot;),format.raw/*3.1*/(&quot;&quot;&quot;&lt;div class=&quot;pong-box&quot; style=&quot;background-color: &quot;&quot;&quot;),_display_(/*3.49*/color),format.raw/*3.54*/(&quot;&quot;&quot;&quot;&gt;\n    &quot;&quot;&quot;),_display_(/*4.6*/emoji),format.raw/*4.11*/(&quot;&quot;&quot; &quot;&quot;&quot;),format.raw/*4.12*/(&quot;&quot;&quot;Pong!\n&lt;/div&gt;\n&quot;&quot;&quot;))\n      }\n    }
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          977
+        </td>
+        <td>
+          708
+          -
+          968
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Seq[Any](format.raw/*2.1*/(&quot;&quot;&quot;\n&quot;&quot;&quot;),format.raw/*3.1*/(&quot;&quot;&quot;&lt;div class=&quot;pong-box&quot; style=&quot;background-color: &quot;&quot;&quot;),_display_(/*3.49*/color),format.raw/*3.54*/(&quot;&quot;&quot;&quot;&gt;\n    &quot;&quot;&quot;),_display_(/*4.6*/emoji),format.raw/*4.11*/(&quot;&quot;&quot; &quot;&quot;&quot;),format.raw/*4.12*/(&quot;&quot;&quot;Pong!\n&lt;/div&gt;\n&quot;&quot;&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          978
+        </td>
+        <td>
+          717
+          -
+          743
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*2.1*/(&quot;&quot;&quot;\n&quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          980
+        </td>
+        <td>
+          817
+          -
+          841
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_(/*3.49*/color)
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          979
+        </td>
+        <td>
+          744
+          -
+          816
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*3.1*/(&quot;&quot;&quot;&lt;div class=&quot;pong-box&quot; style=&quot;background-color: &quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          981
+        </td>
+        <td>
+          842
+          -
+          875
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*3.54*/(&quot;&quot;&quot;&quot;&gt;\n    &quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          983
+        </td>
+        <td>
+          900
+          -
+          927
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*4.11*/(&quot;&quot;&quot; &quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          982
+        </td>
+        <td>
+          876
+          -
+          899
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_(/*4.6*/emoji)
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          984
+        </td>
+        <td>
+          928
+          -
+          967
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*4.12*/(&quot;&quot;&quot;Pong!\n&lt;/div&gt;\n&quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          986
+        </td>
+        <td>
+          1068
+          -
+          1086
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          apply(emoji,color)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          987
+        </td>
+        <td>
+          990
+          -
+          1000
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          render
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def render
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          989
+        </td>
+        <td>
+          1090
+          -
+          1095
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          f
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def f
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          988
+        </td>
+        <td>
+          1173
+          -
+          1191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          apply(emoji,color)
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          990
+        </td>
+        <td>
+          1195
+          -
+          1202
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          ref
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def ref
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

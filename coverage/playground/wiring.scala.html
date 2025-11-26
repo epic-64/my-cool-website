@@ -1,0 +1,3158 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/wiring.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground
+</span>2 <span style=''>
+</span>3 <span style=''>import upickle.default.*
+</span>4 <span style=''>import upickle.implicits.key
+</span>5 <span style=''>
+</span>6 <span style=''>import java.net.URI
+</span>7 <span style=''>import java.net.http.{HttpClient, HttpRequest, HttpResponse}
+</span>8 <span style=''>import scala.util.{Failure, Success, Try}
+</span>9 <span style=''>import scala.util.chaining.scalaUtilChainingOps
+</span>10 <span style=''>
+</span>11 <span style=''>// Domain models with friendly field names mapped to Open-Meteo JSON keys
+</span>12 <span style=''>case class CurrentWeather(
+</span>13 <span style=''>    @key(&quot;temperature&quot;)   temperatureC: Double,
+</span>14 <span style=''>    @key(&quot;windspeed&quot;)     windSpeedKmh: Double,
+</span>15 <span style=''>    @key(&quot;winddirection&quot;) windDirectionDeg: Doubl</span><span style='background: #AEF1AE'>e,
+</span>16 <span style=''></span><span style='background: #AEF1AE'>)
+</span>17 <span style=''></span><span style='background: #AEF1AE'>case </span><span style=''>class WeatherResponse(
+</span>18 <span style=''>    @key(&quot;cur</span><span style='background: #F0ADAD'>rent_weath</span><span style=''>er&quot;) currentWeather: CurrentWeather
+</span>19 <span style=''>)
+</span>20 <span style=''>
+</span>21 <span style=''>object WeatherR</span><span style='background: #F0ADAD'>esponse:
+</span>22 <span style=''></span><span style='background: #F0ADAD'>  given Re</span><span style=''>adWriter[CurrentWeather] = </span><span style='background: #F0ADAD'>macroRW</span><span style=''>
+</span>23 <span style=''>  given ReadWriter[WeatherResponse] = </span><span style='background: #F0ADAD'>macroRW</span><span style=''>
+</span>24 <span style=''>
+</span>25 <span style=''>trait WeatherHttp:
+</span>26 <span style=''>  def fetch(latitude: Double, longitude: Double): Try[String]
+</span>27 <span style=''>
+</span>28 <span style=''>class LiveWeatherHttp(using httpClient: HttpClient) extends WeatherHttp:
+</span>29 <span style=''>  </span><span style='background: #F0ADAD'>private def endpoint</span><span style=''>(latitude: Double, longitude: Double): URI =
+</span>30 <span style=''>    val baseUrl = &quot;https://api.open-meteo.com/v1/forecast&quot;
+</span>31 <span style=''>    </span><span style='background: #F0ADAD'>URI.create(s&quot;$baseUrl?latitude=$latitude&amp;longitude=$longitude&amp;current_weather=true&quot;)</span><span style=''>
+</span>32 <span style=''>
+</span>33 <span style=''>  </span><span style='background: #F0ADAD'>def fetch</span><span style=''>(latitude: Double, longitude: Double): Try[String] =
+</span>34 <span style=''>    val request = </span><span style='background: #F0ADAD'>HttpRequest.newBuilder(endpoint(latitude, longitude)).GET().build()</span><span style=''>
+</span>35 <span style=''>    </span><span style='background: #F0ADAD'>Try(httpClient.send(request, HttpResponse.BodyHandlers.ofString())).map(_.body())</span><span style=''>
+</span>36 <span style=''>
+</span>37 <span style=''>class WeatherClient(using http: WeatherHttp, logger: Logger):
+</span>38 <span style=''>  </span><span style='background: #AEF1AE'>def get</span><span style=''>(latitude: Double, longitude: Double): List[String] =
+</span>39 <span style=''>    </span><span style='background: #AEF1AE'>http.fetch(latitude, longitude)</span><span style=''> match
+</span>40 <span style=''>      case Failure(fetchErr) =&gt;
+</span>41 <span style=''>        </span><span style='background: #AEF1AE'>logger.error(s&quot;${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}&quot;)
+</span>42 <span style=''></span><span style='background: #AEF1AE'>        List(s&quot;We had an error fetching the weather data. Please try again later.&quot;)</span><span style=''>
+</span>43 <span style=''>      case Success(fetchBody) =&gt;
+</span>44 <span style=''>        </span><span style='background: #AEF1AE'>logger.debug(s&quot;Fetched weather data: $fetchBody&quot;)
+</span>45 <span style=''></span><span style='background: #AEF1AE'>        Try(read[WeatherResponse](fetchBody)) match
+</span>46 <span style=''></span><span style='background: #AEF1AE'>          case Failure(parseErr) =&gt;
+</span>47 <span style=''></span><span style='background: #AEF1AE'>            logger.error(s&quot;Parse failure: ${parseErr.getMessage} when parsing: $fetchBody&quot;)
+</span>48 <span style=''></span><span style='background: #AEF1AE'>            List(s&quot;We had an error parsing the weather data. Please try again later.&quot;)
+</span>49 <span style=''></span><span style='background: #AEF1AE'>          case Success(parsed) =&gt;
+</span>50 <span style=''></span><span style='background: #AEF1AE'>            parsed.currentWeather pipe { weather =&gt; List(
+</span>51 <span style=''></span><span style='background: #AEF1AE'>              f&quot;Current temperature: ${weather.temperatureC}%.1f C&quot;,
+</span>52 <span style=''></span><span style='background: #AEF1AE'>              f&quot;Wind speed: ${weather.windSpeedKmh}%.1f km/h&quot;,
+</span>53 <span style=''></span><span style='background: #AEF1AE'>              s&quot;Wind direction: ${weather.windDirectionDeg} degrees&quot;
+</span>54 <span style=''></span><span style='background: #AEF1AE'>            ) }</span><span style=''>
+</span>55 <span style=''>
+</span>56 <span style=''>object ProdWiring:
+</span>57 <span style=''>  given HttpClient = </span><span style='background: #F0ADAD'>HttpClient.newHttpClient()</span><span style=''>
+</span>58 <span style=''>  given WeatherHttp = </span><span style='background: #F0ADAD'>LiveWeatherHttp()</span><span style=''>
+</span>59 <span style=''>  given Logger = </span><span style='background: #F0ADAD'>LiveConsoleLogger()</span><span style=''>
+</span>60 <span style=''>  given WeatherClient = </span><span style='background: #F0ADAD'>WeatherClient()</span><span style=''>
+</span>61 <span style=''>
+</span>62 <span style=''></span><span style='background: #F0ADAD'>def runApp</span><span style=''>()(using client: WeatherClient, logger: Logger): Unit =
+</span>63 <span style=''>  </span><span style='background: #F0ADAD'>logger.info(&quot;=== Live Weather ===&quot;)</span><span style=''>
+</span>64 <span style=''>  </span><span style='background: #F0ADAD'>client.get(12.34, 56.78).foreach(logger.info)</span><span style=''>
+</span>65 <span style=''>
+</span>66 <span style=''>//@main def main(): Unit =
+</span>67 <span style=''>//  import ProdWiring.given
+</span>68 <span style=''>//  runApp()
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          873
+        </td>
+        <td>
+          493
+          -
+          503
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          e,\n)\ncase 
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          840
+        </td>
+        <td>
+          493
+          -
+          503
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          e,\n)\ncase 
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          818
+        </td>
+        <td>
+          539
+          -
+          549
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          rent_weath
+        </td>
+      </tr><tr>
+        <td>
+          18
+        </td>
+        <td>
+          859
+        </td>
+        <td>
+          539
+          -
+          549
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          rent_weath
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          828
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          837
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          819
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          801
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          headOption
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          831
+        </td>
+        <td>
+          603
+          -
+          622
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          write0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          esponse:\n  given Re
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          804
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          813
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          822
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          830
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          812
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          821
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          839
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          824
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          833
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          806
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          809
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          800
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          836
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          827
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          817
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          826
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          835
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          820
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          829
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitEnd
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          802
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          allowUnknownKeys
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          811
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          814
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          868
+        </td>
+        <td>
+          603
+          -
+          622
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          write0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          esponse:\n  given Re
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          841
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          823
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          832
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          808
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          799
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          825
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          834
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          807
+        </td>
+        <td>
+          649
+          -
+          656
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          864
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          855
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          872
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          863
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          length
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          866
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitEnd
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          860
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          869
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeSnippetMappedName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          842
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          join
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          854
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          845
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          allowUnknownKeys
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          862
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          853
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          844
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          headOption
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          847
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          865
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          874
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          writer
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          850
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          867
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          858
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          849
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Literal
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          852
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          861
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          visitNull
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          843
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getOrElse
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          870
+        </td>
+        <td>
+          695
+          -
+          702
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          objectAttributeKeyWriteMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          macroRW
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          877
+        </td>
+        <td>
+          861
+          -
+          881
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          endpoint
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          private def endpoint
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          875
+        </td>
+        <td>
+          989
+          -
+          1073
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          create
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          URI.create(s&quot;$baseUrl?latitude=$latitude&amp;longitude=$longitude&amp;current_weather=true&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          871
+        </td>
+        <td>
+          1012
+          -
+          1029
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeToObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          atitude=$latitude
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          838
+        </td>
+        <td>
+          1012
+          -
+          1029
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeToObject
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          atitude=$latitude
+        </td>
+      </tr><tr>
+        <td>
+          31
+        </td>
+        <td>
+          876
+        </td>
+        <td>
+          1000
+          -
+          1072
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;$baseUrl?latitude=$latitude&amp;longitude=$longitude&amp;current_weather=true&quot;
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          887
+        </td>
+        <td>
+          1077
+          -
+          1086
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fetch
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def fetch
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          881
+        </td>
+        <td>
+          1180
+          -
+          1209
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          endpoint
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          endpoint(latitude, longitude)
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          878
+        </td>
+        <td>
+          1157
+          -
+          1224
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          build
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpRequest.newBuilder(endpoint(latitude, longitude)).GET().build()
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          880
+        </td>
+        <td>
+          1157
+          -
+          1210
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          newBuilder
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpRequest.newBuilder(endpoint(latitude, longitude))
+        </td>
+      </tr><tr>
+        <td>
+          34
+        </td>
+        <td>
+          879
+        </td>
+        <td>
+          1157
+          -
+          1216
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          GET
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpRequest.newBuilder(endpoint(latitude, longitude)).GET()
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          882
+        </td>
+        <td>
+          1229
+          -
+          1310
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(httpClient.send(request, HttpResponse.BodyHandlers.ofString())).map(_.body())
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          884
+        </td>
+        <td>
+          1233
+          -
+          1295
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          send
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          886
+        </td>
+        <td>
+          1301
+          -
+          1309
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          body
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _.body()
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          883
+        </td>
+        <td>
+          1229
+          -
+          1296
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(httpClient.send(request, HttpResponse.BodyHandlers.ofString()))
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          885
+        </td>
+        <td>
+          1258
+          -
+          1294
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          ofString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpResponse.BodyHandlers.ofString()
+        </td>
+      </tr><tr>
+        <td>
+          38
+        </td>
+        <td>
+          916
+        </td>
+        <td>
+          1376
+          -
+          1383
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          def get
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          888
+        </td>
+        <td>
+          1441
+          -
+          1472
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fetch
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          http.fetch(latitude, longitude)
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          891
+        </td>
+        <td>
+          1536
+          -
+          1567
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getSimpleName
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          fetchErr.getClass.getSimpleName
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          890
+        </td>
+        <td>
+          1532
+          -
+          1593
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          s&quot;${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          895
+        </td>
+        <td>
+          1519
+          -
+          1678
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          logger.error(s&quot;${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}&quot;)\n        List(s&quot;We had an error fetching the weather data. Please try again later.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          889
+        </td>
+        <td>
+          1519
+          -
+          1594
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          error
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          logger.error(s&quot;${fetchErr.getClass.getSimpleName}: ${fetchErr.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          892
+        </td>
+        <td>
+          1572
+          -
+          1591
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          fetchErr.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          893
+        </td>
+        <td>
+          1603
+          -
+          1678
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          List(s&quot;We had an error fetching the weather data. Please try again later.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          894
+        </td>
+        <td>
+          1608
+          -
+          1677
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          s&quot;We had an error fetching the weather data. Please try again later.&quot;
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          896
+        </td>
+        <td>
+          1720
+          -
+          1769
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          debug
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          logger.debug(s&quot;Fetched weather data: $fetchBody&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          897
+        </td>
+        <td>
+          1733
+          -
+          1768
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          s&quot;Fetched weather data: $fetchBody&quot;
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          915
+        </td>
+        <td>
+          1720
+          -
+          2345
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          logger.debug(s&quot;Fetched weather data: $fetchBody&quot;)\n        Try(read[WeatherResponse](fetchBody)) match\n          case Failure(parseErr) =&gt;\n            logger.error(s&quot;Parse failure: ${parseErr.getMessage} when parsing: $fetchBody&quot;)\n            List(s&quot;We had an error parsing the weather data. Please try again later.&quot;)\n          case Success(parsed) =&gt;\n            parsed.currentWeather pipe { weather =&gt; List(\n              f&quot;Current temperature: ${weather.temperatureC}%.1f C&quot;,\n              f&quot;Wind speed: ${weather.windSpeedKmh}%.1f km/h&quot;,\n              s&quot;Wind direction: ${weather.windDirectionDeg} degrees&quot;\n            ) }
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          899
+        </td>
+        <td>
+          1782
+          -
+          1814
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          read
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          read[WeatherResponse](fetchBody)
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          898
+        </td>
+        <td>
+          1778
+          -
+          1815
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          Try(read[WeatherResponse](fetchBody))
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          901
+        </td>
+        <td>
+          1782
+          -
+          1803
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          read$default$2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          read[WeatherResponse]
+        </td>
+      </tr><tr>
+        <td>
+          45
+        </td>
+        <td>
+          900
+        </td>
+        <td>
+          1804
+          -
+          1813
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          fetchBody
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          902
+        </td>
+        <td>
+          1870
+          -
+          1949
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          error
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          logger.error(s&quot;Parse failure: ${parseErr.getMessage} when parsing: $fetchBody&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          904
+        </td>
+        <td>
+          1902
+          -
+          1921
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          parseErr.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          907
+        </td>
+        <td>
+          1870
+          -
+          2036
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          logger.error(s&quot;Parse failure: ${parseErr.getMessage} when parsing: $fetchBody&quot;)\n            List(s&quot;We had an error parsing the weather data. Please try again later.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          903
+        </td>
+        <td>
+          1883
+          -
+          1948
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          s&quot;Parse failure: ${parseErr.getMessage} when parsing: $fetchBody&quot;
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          905
+        </td>
+        <td>
+          1962
+          -
+          2036
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          List(s&quot;We had an error parsing the weather data. Please try again later.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          48
+        </td>
+        <td>
+          906
+        </td>
+        <td>
+          1967
+          -
+          2035
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          s&quot;We had an error parsing the weather data. Please try again later.&quot;
+        </td>
+      </tr><tr>
+        <td>
+          49
+        </td>
+        <td>
+          914
+        </td>
+        <td>
+          2068
+          -
+          2345
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          =&gt;\n            parsed.currentWeather pipe { weather =&gt; List(\n              f&quot;Current temperature: ${weather.temperatureC}%.1f C&quot;,\n              f&quot;Wind speed: ${weather.windSpeedKmh}%.1f km/h&quot;,\n              s&quot;Wind direction: ${weather.windDirectionDeg} degrees&quot;\n            ) }
+        </td>
+      </tr><tr>
+        <td>
+          50
+        </td>
+        <td>
+          908
+        </td>
+        <td>
+          2083
+          -
+          2345
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          pipe
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          parsed.currentWeather pipe { weather =&gt; List(\n              f&quot;Current temperature: ${weather.temperatureC}%.1f C&quot;,\n              f&quot;Wind speed: ${weather.windSpeedKmh}%.1f km/h&quot;,\n              s&quot;Wind direction: ${weather.windDirectionDeg} degrees&quot;\n            ) }
+        </td>
+      </tr><tr>
+        <td>
+          50
+        </td>
+        <td>
+          910
+        </td>
+        <td>
+          2123
+          -
+          2343
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          List(\n              f&quot;Current temperature: ${weather.temperatureC}%.1f C&quot;,\n              f&quot;Wind speed: ${weather.windSpeedKmh}%.1f km/h&quot;,\n              s&quot;Wind direction: ${weather.windDirectionDeg} degrees&quot;\n            )
+        </td>
+      </tr><tr>
+        <td>
+          50
+        </td>
+        <td>
+          909
+        </td>
+        <td>
+          2083
+          -
+          2104
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scalaUtilChainingOps
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          parsed.currentWeather
+        </td>
+      </tr><tr>
+        <td>
+          51
+        </td>
+        <td>
+          911
+        </td>
+        <td>
+          2143
+          -
+          2196
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          f
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          f&quot;Current temperature: ${weather.temperatureC}%.1f C&quot;
+        </td>
+      </tr><tr>
+        <td>
+          52
+        </td>
+        <td>
+          912
+        </td>
+        <td>
+          2212
+          -
+          2259
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          f
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          f&quot;Wind speed: ${weather.windSpeedKmh}%.1f km/h&quot;
+        </td>
+      </tr><tr>
+        <td>
+          53
+        </td>
+        <td>
+          913
+        </td>
+        <td>
+          2275
+          -
+          2329
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          s&quot;Wind direction: ${weather.windDirectionDeg} degrees&quot;
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          917
+        </td>
+        <td>
+          2387
+          -
+          2413
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          newHttpClient
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          HttpClient.newHttpClient()
+        </td>
+      </tr><tr>
+        <td>
+          58
+        </td>
+        <td>
+          918
+        </td>
+        <td>
+          2436
+          -
+          2453
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          LiveWeatherHttp()
+        </td>
+      </tr><tr>
+        <td>
+          59
+        </td>
+        <td>
+          919
+        </td>
+        <td>
+          2471
+          -
+          2490
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          LiveConsoleLogger()
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          920
+        </td>
+        <td>
+          2515
+          -
+          2530
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          WeatherClient()
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          925
+        </td>
+        <td>
+          2532
+          -
+          2542
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          runApp
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def runApp
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          921
+        </td>
+        <td>
+          2600
+          -
+          2635
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          info
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          logger.info(&quot;=== Live Weather ===&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          64
+        </td>
+        <td>
+          923
+        </td>
+        <td>
+          2638
+          -
+          2662
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          client.get(12.34, 56.78)
+        </td>
+      </tr><tr>
+        <td>
+          64
+        </td>
+        <td>
+          922
+        </td>
+        <td>
+          2638
+          -
+          2683
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          foreach
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          client.get(12.34, 56.78).foreach(logger.info)
+        </td>
+      </tr><tr>
+        <td>
+          64
+        </td>
+        <td>
+          924
+        </td>
+        <td>
+          2671
+          -
+          2682
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          info
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          logger.info
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          846
+        </td>
+        <td>
+          2812
+          -
+          2834
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          visitors0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          810
+        </td>
+        <td>
+          2974
+          -
+          2997
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          keyToIndex
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          857
+        </td>
+        <td>
+          3124
+          -
+          3150
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          storeDefaults
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          848
+        </td>
+        <td>
+          2907
+          -
+          2931
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          803
+        </td>
+        <td>
+          2812
+          -
+          2834
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          visitors0
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          815
+        </td>
+        <td>
+          3048
+          -
+          3073
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allKeysArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          851
+        </td>
+        <td>
+          2974
+          -
+          2997
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          keyToIndex
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          856
+        </td>
+        <td>
+          3048
+          -
+          3073
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          allKeysArray
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          805
+        </td>
+        <td>
+          2907
+          -
+          2931
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fromProduct
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          816
+        </td>
+        <td>
+          3124
+          -
+          3150
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          storeDefaults
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #AEF1AE">
+          
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

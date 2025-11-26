@@ -1,0 +1,4220 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/typestate.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground
+</span>2 <span style=''>
+</span>3 <span style=''>import playground.ContractModelRW.*
+</span>4 <span style=''>import upickle.default.{read, write}
+</span>5 <span style=''>
+</span>6 <span style=''>import java.io.File
+</span>7 <span style=''>import java.nio.charset.StandardCharsets
+</span>8 <span style=''>import java.nio.file.Files
+</span>9 <span style=''>import scala.util.chaining.scalaUtilChainingOps
+</span>10 <span style=''>import scala.util.{Failure, Success, Try}
+</span>11 <span style=''>
+</span>12 <span style=''>extension (file: File)
+</span>13 <span style=''>  </span><span style='background: #F0ADAD'>def writeText</span><span style=''>(text: String): Try[Unit] = </span><span style='background: #F0ADAD'>Try:
+</span>14 <span style=''></span><span style='background: #F0ADAD'>    Files.writeString(file.toPath, text, StandardCharsets.UTF_8)</span><span style=''>
+</span>15 <span style=''>
+</span>16 <span style=''>  </span><span style='background: #F0ADAD'>def readText</span><span style=''>(): Try[String] = </span><span style='background: #F0ADAD'>Try:
+</span>17 <span style=''></span><span style='background: #F0ADAD'>    Files.readString(file.toPath, StandardCharsets.UTF_8)</span><span style=''>
+</span>18 <span style=''>
+</span>19 <span style=''>object ContractPersistence:
+</span>20 <span style=''>  </span><span style='background: #F0ADAD'>def filePath</span><span style=''>(id: String) = </span><span style='background: #F0ADAD'>s&quot;data/contract_state_$id.json&quot;</span><span style=''>
+</span>21 <span style=''>
+</span>22 <span style=''>  </span><span style='background: #F0ADAD'>def save</span><span style=''>(contract: StatefulContract[?]): Try[Unit] = </span><span style='background: #F0ADAD'>Try:
+</span>23 <span style=''></span><span style='background: #F0ADAD'>    StatefulContractDto.fromStatefulContract(contract).toJson.tap: json =&gt;
+</span>24 <span style=''></span><span style='background: #F0ADAD'>      File(filePath(contract.id)).tap: file =&gt;
+</span>25 <span style=''></span><span style='background: #F0ADAD'>        Option(file.getParentFile).foreach(_.mkdirs())
+</span>26 <span style=''></span><span style='background: #F0ADAD'>        file.writeText(json)</span><span style=''>
+</span>27 <span style=''>
+</span>28 <span style=''>  </span><span style='background: #F0ADAD'>def load</span><span style=''>(id: String): Try[StatefulContractDto] = </span><span style='background: #F0ADAD'>Try:
+</span>29 <span style=''></span><span style='background: #F0ADAD'>    val json = File(filePath(id)).readText().get
+</span>30 <span style=''></span><span style='background: #F0ADAD'>    read[StatefulContractDto](json)</span><span style=''>
+</span>31 <span style=''>
+</span>32 <span style=''></span><span style='background: #F0ADAD'>def example1</span><span style=''>(): Unit =
+</span>33 <span style=''>  val contract = </span><span style='background: #F0ADAD'>Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract</span><span style=''>
+</span>34 <span style=''>
+</span>35 <span style=''>  val saved = try </span><span style='background: #F0ADAD'>{
+</span>36 <span style=''></span><span style='background: #F0ADAD'>    contract.save().get
+</span>37 <span style=''></span><span style='background: #F0ADAD'>  }</span><span style=''> catch {
+</span>38 <span style=''>    case e: Exception =&gt;
+</span>39 <span style=''>      </span><span style='background: #F0ADAD'>println(s&quot;Failed to save contract: ${e.getMessage}&quot;)
+</span>40 <span style=''></span><span style='background: #F0ADAD'>      return</span><span style=''>
+</span>41 <span style=''>  }
+</span>42 <span style=''>
+</span>43 <span style=''>  val signed1 = try </span><span style='background: #F0ADAD'>{
+</span>44 <span style=''></span><span style='background: #F0ADAD'>    contract.signByParty1().get
+</span>45 <span style=''></span><span style='background: #F0ADAD'>  }</span><span style=''> catch {
+</span>46 <span style=''>    case e: Exception =&gt;
+</span>47 <span style=''>      </span><span style='background: #F0ADAD'>println(s&quot;Failed to sign by Party1: ${e.getMessage}&quot;)
+</span>48 <span style=''></span><span style='background: #F0ADAD'>      return</span><span style=''>
+</span>49 <span style=''>  }
+</span>50 <span style=''>
+</span>51 <span style=''>  val signed2 = try </span><span style='background: #F0ADAD'>{
+</span>52 <span style=''></span><span style='background: #F0ADAD'>    signed1.signByParty2().get
+</span>53 <span style=''></span><span style='background: #F0ADAD'>  }</span><span style=''> catch {
+</span>54 <span style=''>    case e: Exception =&gt;
+</span>55 <span style=''>      </span><span style='background: #F0ADAD'>println(s&quot;Failed to sign by Party2: ${e.getMessage}&quot;)
+</span>56 <span style=''></span><span style='background: #F0ADAD'>      return</span><span style=''>
+</span>57 <span style=''>  }
+</span>58 <span style=''>
+</span>59 <span style=''>  try </span><span style='background: #F0ADAD'>{
+</span>60 <span style=''></span><span style='background: #F0ADAD'>    signed2.sendEmail(signed2.party1, &quot;Contract signed!&quot;).get
+</span>61 <span style=''></span><span style='background: #F0ADAD'>  }</span><span style=''> catch {
+</span>62 <span style=''>    case e: Exception =&gt;
+</span>63 <span style=''>      </span><span style='background: #F0ADAD'>println(s&quot;Failed to send email to Party1: ${e.getMessage}&quot;)
+</span>64 <span style=''></span><span style='background: #F0ADAD'>      return</span><span style=''>
+</span>65 <span style=''>  }
+</span>66 <span style=''>
+</span>67 <span style=''>  try </span><span style='background: #F0ADAD'>{
+</span>68 <span style=''></span><span style='background: #F0ADAD'>    signed2.sendEmail(signed2.party2, &quot;Contract signed!&quot;).get
+</span>69 <span style=''></span><span style='background: #F0ADAD'>  }</span><span style=''> catch {
+</span>70 <span style=''>    case e: Exception =&gt;
+</span>71 <span style=''>      </span><span style='background: #F0ADAD'>println(s&quot;Failed to send email to Party2: ${e.getMessage}&quot;)
+</span>72 <span style=''></span><span style='background: #F0ADAD'>      return</span><span style=''>
+</span>73 <span style=''>  }
+</span>74 <span style=''>
+</span>75 <span style=''>  </span><span style='background: #F0ADAD'>println(&quot;Contract process completed successfully.&quot;)</span><span style=''>
+</span>76 <span style=''>
+</span>77 <span style=''></span><span style='background: #F0ADAD'>def example2</span><span style=''>(): Unit =
+</span>78 <span style=''>  </span><span style='background: #F0ADAD'>Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract.save()</span><span style=''> match
+</span>79 <span style=''>    case Failure(err) </span><span style='background: #F0ADAD'>=&gt; println(s&quot;Failed to save contract: ${err.getMessage}&quot;);</span><span style=''>
+</span>80 <span style=''>    case Success(c) </span><span style='background: #F0ADAD'>=&gt; c.signByParty1() match
+</span>81 <span style=''></span><span style='background: #F0ADAD'>      case Failure(err) =&gt; println(s&quot;Failed to sign by Party1: ${err.getMessage}&quot;);
+</span>82 <span style=''></span><span style='background: #F0ADAD'>      case Success(c) =&gt; c.signByParty2() match
+</span>83 <span style=''></span><span style='background: #F0ADAD'>        case Failure(err) =&gt; println(s&quot;Failed to sign by Party2: ${err.getMessage}&quot;);
+</span>84 <span style=''></span><span style='background: #F0ADAD'>        case Success(c) =&gt; c.sendEmail(c.party1, &quot;Contract signed!&quot;) match
+</span>85 <span style=''></span><span style='background: #F0ADAD'>          case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);
+</span>86 <span style=''></span><span style='background: #F0ADAD'>          case Success(_) =&gt; c.sendEmail(c.party2, &quot;Contract signed!&quot;) match
+</span>87 <span style=''></span><span style='background: #F0ADAD'>            case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);
+</span>88 <span style=''></span><span style='background: #F0ADAD'>            case Success(_) =&gt; println(&quot;Contract process completed successfully.&quot;)</span><span style=''>
+</span>89 <span style=''>
+</span>90 <span style=''></span><span style='background: #F0ADAD'>def context</span><span style=''>[A](info: String)(block: =&gt; Try[A]): Try[A] =
+</span>91 <span style=''>  </span><span style='background: #F0ADAD'>block.recoverWith:
+</span>92 <span style=''></span><span style='background: #F0ADAD'>    case e =&gt; Failure(new Exception(s&quot;$info: ${e.getMessage}&quot;, e))</span><span style=''>
+</span>93 <span style=''>
+</span>94 <span style=''></span><span style='background: #F0ADAD'>def example3</span><span style=''>(): Unit =
+</span>95 <span style=''>  (</span><span style='background: #F0ADAD'>for
+</span>96 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- Success(Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract)
+</span>97 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Failed to save contract&quot;) { c.save() }
+</span>98 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }
+</span>99 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }
+</span>100 <span style=''></span><span style='background: #F0ADAD'>    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }
+</span>101 <span style=''></span><span style='background: #F0ADAD'>    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }
+</span>102 <span style=''></span><span style='background: #F0ADAD'>  yield c</span><span style=''>) match
+</span>103 <span style=''>    case Failure(e) </span><span style='background: #F0ADAD'>=&gt; println(s&quot;Operation failed: ${e.getMessage}&quot;)</span><span style=''>
+</span>104 <span style=''>    case Success(c) </span><span style='background: #F0ADAD'>=&gt; println(&quot;Contract process completed successfully.&quot;)</span><span style=''>
+</span>105 <span style=''>
+</span>106 <span style=''></span><span style='background: #F0ADAD'>def example4</span><span style=''>(): Unit =
+</span>107 <span style=''>  (</span><span style='background: #F0ADAD'>for
+</span>108 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Failed to load contract&quot;) { ContractPersistence.load(&quot;ABC123&quot;) }
+</span>109 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Contract is not in unsigned State&quot;) { c.asUnsigned() }
+</span>110 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }
+</span>111 <span style=''></span><span style='background: #F0ADAD'>    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }
+</span>112 <span style=''></span><span style='background: #F0ADAD'>    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }
+</span>113 <span style=''></span><span style='background: #F0ADAD'>    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }
+</span>114 <span style=''></span><span style='background: #F0ADAD'>  yield (c)</span><span style=''>) match
+</span>115 <span style=''>    case Failure(e) </span><span style='background: #F0ADAD'>=&gt; println(s&quot;Operation failed: ${e.getMessage}&quot;)</span><span style=''>
+</span>116 <span style=''>    case Success(c) </span><span style='background: #F0ADAD'>=&gt; println(&quot;Contract process completed successfully.&quot;)</span><span style=''>
+</span>117 <span style=''>
+</span>118 <span style=''></span><span style='background: #F0ADAD'>@main def main</span><span style=''>(): Unit =
+</span>119 <span style=''>  </span><span style='background: #F0ADAD'>example1()</span><span style=''>
+</span>120 <span style=''>  </span><span style='background: #F0ADAD'>example2()</span><span style=''>
+</span>121 <span style=''>  </span><span style='background: #F0ADAD'>example3()</span><span style=''>
+</span>122 <span style=''>  </span><span style='background: #F0ADAD'>example4()</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          13
+        </td>
+        <td>
+          659
+        </td>
+        <td>
+          298
+          -
+          311
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          writeText
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def writeText
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          657
+        </td>
+        <td>
+          348
+          -
+          408
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Files.writeString(file.toPath, text, StandardCharsets.UTF_8)
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          656
+        </td>
+        <td>
+          339
+          -
+          408
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    Files.writeString(file.toPath, text, StandardCharsets.UTF_8)
+        </td>
+      </tr><tr>
+        <td>
+          14
+        </td>
+        <td>
+          658
+        </td>
+        <td>
+          366
+          -
+          377
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toPath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.toPath
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          663
+        </td>
+        <td>
+          412
+          -
+          424
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          readText
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def readText
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          660
+        </td>
+        <td>
+          442
+          -
+          504
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    Files.readString(file.toPath, StandardCharsets.UTF_8)
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          662
+        </td>
+        <td>
+          468
+          -
+          479
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toPath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.toPath
+        </td>
+      </tr><tr>
+        <td>
+          17
+        </td>
+        <td>
+          661
+        </td>
+        <td>
+          451
+          -
+          504
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Files.readString(file.toPath, StandardCharsets.UTF_8)
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          630
+        </td>
+        <td>
+          563
+          -
+          594
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;data/contract_state_$id.json&quot;
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          631
+        </td>
+        <td>
+          536
+          -
+          548
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          filePath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def filePath
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          646
+        </td>
+        <td>
+          598
+          -
+          606
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def save
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          636
+        </td>
+        <td>
+          660
+          -
+          717
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          toJson
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          StatefulContractDto.fromStatefulContract(contract).toJson
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          633
+        </td>
+        <td>
+          660
+          -
+          861
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          tap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          StatefulContractDto.fromStatefulContract(contract).toJson.tap: json =&gt;\n      File(filePath(contract.id)).tap: file =&gt;\n        Option(file.getParentFile).foreach(_.mkdirs())\n        file.writeText(json)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          632
+        </td>
+        <td>
+          651
+          -
+          861
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    StatefulContractDto.fromStatefulContract(contract).toJson.tap: json =&gt;\n      File(filePath(contract.id)).tap: file =&gt;\n        Option(file.getParentFile).foreach(_.mkdirs())\n        file.writeText(json)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          635
+        </td>
+        <td>
+          660
+          -
+          710
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromStatefulContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          StatefulContractDto.fromStatefulContract(contract)
+        </td>
+      </tr><tr>
+        <td>
+          23
+        </td>
+        <td>
+          634
+        </td>
+        <td>
+          660
+          -
+          717
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scalaUtilChainingOps
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          StatefulContractDto.fromStatefulContract(contract).toJson
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          639
+        </td>
+        <td>
+          737
+          -
+          764
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          File(filePath(contract.id))
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          638
+        </td>
+        <td>
+          737
+          -
+          764
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          scalaUtilChainingOps
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          File(filePath(contract.id))
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          640
+        </td>
+        <td>
+          742
+          -
+          763
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          filePath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          filePath(contract.id)
+        </td>
+      </tr><tr>
+        <td>
+          24
+        </td>
+        <td>
+          637
+        </td>
+        <td>
+          737
+          -
+          861
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          tap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          File(filePath(contract.id)).tap: file =&gt;\n        Option(file.getParentFile).foreach(_.mkdirs())\n        file.writeText(json)
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          642
+        </td>
+        <td>
+          786
+          -
+          812
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Option(file.getParentFile)
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          641
+        </td>
+        <td>
+          786
+          -
+          832
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          foreach
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Option(file.getParentFile).foreach(_.mkdirs())
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          644
+        </td>
+        <td>
+          821
+          -
+          831
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          mkdirs
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _.mkdirs()
+        </td>
+      </tr><tr>
+        <td>
+          25
+        </td>
+        <td>
+          643
+        </td>
+        <td>
+          793
+          -
+          811
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getParentFile
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.getParentFile
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          645
+        </td>
+        <td>
+          841
+          -
+          861
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          writeText
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          file.writeText(json)
+        </td>
+      </tr><tr>
+        <td>
+          28
+        </td>
+        <td>
+          655
+        </td>
+        <td>
+          865
+          -
+          873
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          load
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def load
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          648
+        </td>
+        <td>
+          934
+          -
+          963
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readText
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          File(filePath(id)).readText()
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          651
+        </td>
+        <td>
+          934
+          -
+          967
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          File(filePath(id)).readText().get
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          650
+        </td>
+        <td>
+          939
+          -
+          951
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          filePath
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          filePath(id)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          647
+        </td>
+        <td>
+          914
+          -
+          1003
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try:\n    val json = File(filePath(id)).readText().get\n    read[StatefulContractDto](json)
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          649
+        </td>
+        <td>
+          934
+          -
+          952
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          File(filePath(id))
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          654
+        </td>
+        <td>
+          972
+          -
+          997
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          read$default$2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          read[StatefulContractDto]
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          653
+        </td>
+        <td>
+          998
+          -
+          1002
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fromString
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          json
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          652
+        </td>
+        <td>
+          972
+          -
+          1003
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          read
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          read[StatefulContractDto](json)
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          701
+        </td>
+        <td>
+          1005
+          -
+          1017
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          example1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def example1
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          664
+        </td>
+        <td>
+          1045
+          -
+          1098
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toStatefulContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          667
+        </td>
+        <td>
+          1118
+          -
+          1147
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          {\n    contract.save().get\n  }
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          666
+        </td>
+        <td>
+          1124
+          -
+          1143
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          contract.save().get
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          665
+        </td>
+        <td>
+          1124
+          -
+          1139
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          contract.save()
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          669
+        </td>
+        <td>
+          1195
+          -
+          1238
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to save contract: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          668
+        </td>
+        <td>
+          1187
+          -
+          1239
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to save contract: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          671
+        </td>
+        <td>
+          1187
+          -
+          1252
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to save contract: ${e.getMessage}&quot;)\n      return
+        </td>
+      </tr><tr>
+        <td>
+          39
+        </td>
+        <td>
+          670
+        </td>
+        <td>
+          1224
+          -
+          1236
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          674
+        </td>
+        <td>
+          1278
+          -
+          1315
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          {\n    contract.signByParty1().get\n  }
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          672
+        </td>
+        <td>
+          1284
+          -
+          1307
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          contract.signByParty1()
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          673
+        </td>
+        <td>
+          1284
+          -
+          1311
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          contract.signByParty1().get
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          678
+        </td>
+        <td>
+          1355
+          -
+          1421
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to sign by Party1: ${e.getMessage}&quot;)\n      return
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          675
+        </td>
+        <td>
+          1355
+          -
+          1408
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to sign by Party1: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          677
+        </td>
+        <td>
+          1393
+          -
+          1405
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          47
+        </td>
+        <td>
+          676
+        </td>
+        <td>
+          1363
+          -
+          1407
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to sign by Party1: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          51
+        </td>
+        <td>
+          681
+        </td>
+        <td>
+          1447
+          -
+          1483
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          {\n    signed1.signByParty2().get\n  }
+        </td>
+      </tr><tr>
+        <td>
+          52
+        </td>
+        <td>
+          680
+        </td>
+        <td>
+          1453
+          -
+          1479
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          signed1.signByParty2().get
+        </td>
+      </tr><tr>
+        <td>
+          52
+        </td>
+        <td>
+          679
+        </td>
+        <td>
+          1453
+          -
+          1475
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          signed1.signByParty2()
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          684
+        </td>
+        <td>
+          1561
+          -
+          1573
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          683
+        </td>
+        <td>
+          1531
+          -
+          1575
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to sign by Party2: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          682
+        </td>
+        <td>
+          1523
+          -
+          1576
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to sign by Party2: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          685
+        </td>
+        <td>
+          1523
+          -
+          1589
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to sign by Party2: ${e.getMessage}&quot;)\n      return
+        </td>
+      </tr><tr>
+        <td>
+          59
+        </td>
+        <td>
+          688
+        </td>
+        <td>
+          1601
+          -
+          1668
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          {\n    signed2.sendEmail(signed2.party1, &quot;Contract signed!&quot;).get\n  }
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          687
+        </td>
+        <td>
+          1607
+          -
+          1664
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          signed2.sendEmail(signed2.party1, &quot;Contract signed!&quot;).get
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          686
+        </td>
+        <td>
+          1607
+          -
+          1660
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          signed2.sendEmail(signed2.party1, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          690
+        </td>
+        <td>
+          1716
+          -
+          1766
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to send email to Party1: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          692
+        </td>
+        <td>
+          1708
+          -
+          1780
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to send email to Party1: ${e.getMessage}&quot;)\n      return
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          689
+        </td>
+        <td>
+          1708
+          -
+          1767
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to send email to Party1: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          63
+        </td>
+        <td>
+          691
+        </td>
+        <td>
+          1752
+          -
+          1764
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          67
+        </td>
+        <td>
+          695
+        </td>
+        <td>
+          1792
+          -
+          1859
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          {\n    signed2.sendEmail(signed2.party2, &quot;Contract signed!&quot;).get\n  }
+        </td>
+      </tr><tr>
+        <td>
+          68
+        </td>
+        <td>
+          693
+        </td>
+        <td>
+          1798
+          -
+          1851
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          signed2.sendEmail(signed2.party2, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          68
+        </td>
+        <td>
+          694
+        </td>
+        <td>
+          1798
+          -
+          1855
+        </td>
+        <td>
+          Select
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          signed2.sendEmail(signed2.party2, &quot;Contract signed!&quot;).get
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          696
+        </td>
+        <td>
+          1899
+          -
+          1958
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to send email to Party2: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          699
+        </td>
+        <td>
+          1899
+          -
+          1971
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to send email to Party2: ${e.getMessage}&quot;)\n      return
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          698
+        </td>
+        <td>
+          1943
+          -
+          1955
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          697
+        </td>
+        <td>
+          1907
+          -
+          1957
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to send email to Party2: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          75
+        </td>
+        <td>
+          700
+        </td>
+        <td>
+          1979
+          -
+          2030
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          77
+        </td>
+        <td>
+          734
+        </td>
+        <td>
+          2032
+          -
+          2044
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          example2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def example2
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          702
+        </td>
+        <td>
+          2057
+          -
+          2117
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract.save()
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          703
+        </td>
+        <td>
+          2057
+          -
+          2110
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toStatefulContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract
+        </td>
+      </tr><tr>
+        <td>
+          79
+        </td>
+        <td>
+          705
+        </td>
+        <td>
+          2157
+          -
+          2202
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to save contract: ${err.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          79
+        </td>
+        <td>
+          704
+        </td>
+        <td>
+          2149
+          -
+          2203
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to save contract: ${err.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          79
+        </td>
+        <td>
+          707
+        </td>
+        <td>
+          2146
+          -
+          2204
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Failed to save contract: ${err.getMessage}&quot;);
+        </td>
+      </tr><tr>
+        <td>
+          79
+        </td>
+        <td>
+          706
+        </td>
+        <td>
+          2186
+          -
+          2200
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          80
+        </td>
+        <td>
+          708
+        </td>
+        <td>
+          2228
+          -
+          2244
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.signByParty1()
+        </td>
+      </tr><tr>
+        <td>
+          80
+        </td>
+        <td>
+          733
+        </td>
+        <td>
+          2225
+          -
+          2873
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; c.signByParty1() match\n      case Failure(err) =&gt; println(s&quot;Failed to sign by Party1: ${err.getMessage}&quot;);\n      case Success(c) =&gt; c.signByParty2() match\n        case Failure(err) =&gt; println(s&quot;Failed to sign by Party2: ${err.getMessage}&quot;);\n        case Success(c) =&gt; c.sendEmail(c.party1, &quot;Contract signed!&quot;) match\n          case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n          case Success(_) =&gt; c.sendEmail(c.party2, &quot;Contract signed!&quot;) match\n            case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n            case Success(_) =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          711
+        </td>
+        <td>
+          2316
+          -
+          2330
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          710
+        </td>
+        <td>
+          2286
+          -
+          2332
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to sign by Party1: ${err.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          709
+        </td>
+        <td>
+          2278
+          -
+          2333
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to sign by Party1: ${err.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          81
+        </td>
+        <td>
+          712
+        </td>
+        <td>
+          2275
+          -
+          2334
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Failed to sign by Party1: ${err.getMessage}&quot;);
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          732
+        </td>
+        <td>
+          2357
+          -
+          2873
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; c.signByParty2() match\n        case Failure(err) =&gt; println(s&quot;Failed to sign by Party2: ${err.getMessage}&quot;);\n        case Success(c) =&gt; c.sendEmail(c.party1, &quot;Contract signed!&quot;) match\n          case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n          case Success(_) =&gt; c.sendEmail(c.party2, &quot;Contract signed!&quot;) match\n            case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n            case Success(_) =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          82
+        </td>
+        <td>
+          713
+        </td>
+        <td>
+          2360
+          -
+          2376
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.signByParty2()
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          714
+        </td>
+        <td>
+          2412
+          -
+          2467
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to sign by Party2: ${err.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          717
+        </td>
+        <td>
+          2409
+          -
+          2468
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Failed to sign by Party2: ${err.getMessage}&quot;);
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          716
+        </td>
+        <td>
+          2450
+          -
+          2464
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          83
+        </td>
+        <td>
+          715
+        </td>
+        <td>
+          2420
+          -
+          2466
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to sign by Party2: ${err.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          731
+        </td>
+        <td>
+          2493
+          -
+          2873
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; c.sendEmail(c.party1, &quot;Contract signed!&quot;) match\n          case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n          case Success(_) =&gt; c.sendEmail(c.party2, &quot;Contract signed!&quot;) match\n            case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n            case Success(_) =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          84
+        </td>
+        <td>
+          718
+        </td>
+        <td>
+          2496
+          -
+          2537
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.sendEmail(c.party1, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          85
+        </td>
+        <td>
+          720
+        </td>
+        <td>
+          2583
+          -
+          2625
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to send email: ${err.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          85
+        </td>
+        <td>
+          719
+        </td>
+        <td>
+          2575
+          -
+          2626
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to send email: ${err.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          85
+        </td>
+        <td>
+          722
+        </td>
+        <td>
+          2572
+          -
+          2627
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);
+        </td>
+      </tr><tr>
+        <td>
+          85
+        </td>
+        <td>
+          721
+        </td>
+        <td>
+          2609
+          -
+          2623
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          723
+        </td>
+        <td>
+          2657
+          -
+          2698
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.sendEmail(c.party2, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          86
+        </td>
+        <td>
+          730
+        </td>
+        <td>
+          2654
+          -
+          2873
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; c.sendEmail(c.party2, &quot;Contract signed!&quot;) match\n            case Failure(err) =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);\n            case Success(_) =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          726
+        </td>
+        <td>
+          2772
+          -
+          2786
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          725
+        </td>
+        <td>
+          2746
+          -
+          2788
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Failed to send email: ${err.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          724
+        </td>
+        <td>
+          2738
+          -
+          2789
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Failed to send email: ${err.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          87
+        </td>
+        <td>
+          727
+        </td>
+        <td>
+          2735
+          -
+          2790
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Failed to send email: ${err.getMessage}&quot;);
+        </td>
+      </tr><tr>
+        <td>
+          88
+        </td>
+        <td>
+          729
+        </td>
+        <td>
+          2819
+          -
+          2873
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          88
+        </td>
+        <td>
+          728
+        </td>
+        <td>
+          2822
+          -
+          2873
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          90
+        </td>
+        <td>
+          740
+        </td>
+        <td>
+          2875
+          -
+          2886
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def context
+        </td>
+      </tr><tr>
+        <td>
+          92
+        </td>
+        <td>
+          738
+        </td>
+        <td>
+          3000
+          -
+          3012
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          92
+        </td>
+        <td>
+          735
+        </td>
+        <td>
+          2934
+          -
+          3019
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          recoverWith
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          block.recoverWith:\n    case e =&gt; Failure(new Exception(s&quot;$info: ${e.getMessage}&quot;, e))
+        </td>
+      </tr><tr>
+        <td>
+          92
+        </td>
+        <td>
+          737
+        </td>
+        <td>
+          2989
+          -
+          3014
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;$info: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          92
+        </td>
+        <td>
+          736
+        </td>
+        <td>
+          2975
+          -
+          3018
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new Exception(s&quot;$info: ${e.getMessage}&quot;, e)
+        </td>
+      </tr><tr>
+        <td>
+          92
+        </td>
+        <td>
+          739
+        </td>
+        <td>
+          2964
+          -
+          3019
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Failure(new Exception(s&quot;$info: ${e.getMessage}&quot;, e))
+        </td>
+      </tr><tr>
+        <td>
+          94
+        </td>
+        <td>
+          766
+        </td>
+        <td>
+          3021
+          -
+          3033
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          example3
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def example3
+        </td>
+      </tr><tr>
+        <td>
+          95
+        </td>
+        <td>
+          741
+        </td>
+        <td>
+          3047
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          for\n    c &lt;- Success(Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract)\n    c &lt;- context(&quot;Failed to save contract&quot;) { c.save() }\n    c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }\n    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          96
+        </td>
+        <td>
+          742
+        </td>
+        <td>
+          3068
+          -
+          3121
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          toStatefulContract
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Contract(&quot;ABC123&quot;, &quot;Alice&quot;, &quot;Bob&quot;).toStatefulContract
+        </td>
+      </tr><tr>
+        <td>
+          97
+        </td>
+        <td>
+          744
+        </td>
+        <td>
+          3132
+          -
+          3179
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to save contract&quot;) { c.save() }
+        </td>
+      </tr><tr>
+        <td>
+          97
+        </td>
+        <td>
+          743
+        </td>
+        <td>
+          3127
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c &lt;- context(&quot;Failed to save contract&quot;) { c.save() }\n    c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }\n    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          97
+        </td>
+        <td>
+          745
+        </td>
+        <td>
+          3169
+          -
+          3177
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          save
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.save()
+        </td>
+      </tr><tr>
+        <td>
+          98
+        </td>
+        <td>
+          747
+        </td>
+        <td>
+          3189
+          -
+          3245
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }
+        </td>
+      </tr><tr>
+        <td>
+          98
+        </td>
+        <td>
+          746
+        </td>
+        <td>
+          3184
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }\n    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          98
+        </td>
+        <td>
+          748
+        </td>
+        <td>
+          3227
+          -
+          3243
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.signByParty1()
+        </td>
+      </tr><tr>
+        <td>
+          99
+        </td>
+        <td>
+          750
+        </td>
+        <td>
+          3255
+          -
+          3311
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }
+        </td>
+      </tr><tr>
+        <td>
+          99
+        </td>
+        <td>
+          749
+        </td>
+        <td>
+          3250
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          99
+        </td>
+        <td>
+          751
+        </td>
+        <td>
+          3293
+          -
+          3309
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.signByParty2()
+        </td>
+      </tr><tr>
+        <td>
+          100
+        </td>
+        <td>
+          753
+        </td>
+        <td>
+          3321
+          -
+          3408
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }
+        </td>
+      </tr><tr>
+        <td>
+          100
+        </td>
+        <td>
+          752
+        </td>
+        <td>
+          3316
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          100
+        </td>
+        <td>
+          754
+        </td>
+        <td>
+          3365
+          -
+          3406
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.sendEmail(c.party1, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          101
+        </td>
+        <td>
+          756
+        </td>
+        <td>
+          3418
+          -
+          3505
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }
+        </td>
+      </tr><tr>
+        <td>
+          101
+        </td>
+        <td>
+          759
+        </td>
+        <td>
+          3413
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          101
+        </td>
+        <td>
+          755
+        </td>
+        <td>
+          3413
+          -
+          3515
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield c
+        </td>
+      </tr><tr>
+        <td>
+          101
+        </td>
+        <td>
+          757
+        </td>
+        <td>
+          3462
+          -
+          3503
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.sendEmail(c.party2, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          102
+        </td>
+        <td>
+          758
+        </td>
+        <td>
+          3514
+          -
+          3515
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          c
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c
+        </td>
+      </tr><tr>
+        <td>
+          103
+        </td>
+        <td>
+          762
+        </td>
+        <td>
+          3576
+          -
+          3588
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          103
+        </td>
+        <td>
+          761
+        </td>
+        <td>
+          3554
+          -
+          3590
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Operation failed: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          103
+        </td>
+        <td>
+          760
+        </td>
+        <td>
+          3546
+          -
+          3591
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Operation failed: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          103
+        </td>
+        <td>
+          763
+        </td>
+        <td>
+          3543
+          -
+          3591
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Operation failed: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          104
+        </td>
+        <td>
+          765
+        </td>
+        <td>
+          3612
+          -
+          3666
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          104
+        </td>
+        <td>
+          764
+        </td>
+        <td>
+          3615
+          -
+          3666
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          106
+        </td>
+        <td>
+          793
+        </td>
+        <td>
+          3668
+          -
+          3680
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          example4
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def example4
+        </td>
+      </tr><tr>
+        <td>
+          107
+        </td>
+        <td>
+          767
+        </td>
+        <td>
+          3694
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          for\n    c &lt;- context(&quot;Failed to load contract&quot;) { ContractPersistence.load(&quot;ABC123&quot;) }\n    c &lt;- context(&quot;Contract is not in unsigned State&quot;) { c.asUnsigned() }\n    c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }\n    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          108
+        </td>
+        <td>
+          768
+        </td>
+        <td>
+          3707
+          -
+          3780
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to load contract&quot;) { ContractPersistence.load(&quot;ABC123&quot;) }
+        </td>
+      </tr><tr>
+        <td>
+          108
+        </td>
+        <td>
+          769
+        </td>
+        <td>
+          3744
+          -
+          3778
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          load
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          ContractPersistence.load(&quot;ABC123&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          109
+        </td>
+        <td>
+          771
+        </td>
+        <td>
+          3790
+          -
+          3853
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Contract is not in unsigned State&quot;) { c.asUnsigned() }
+        </td>
+      </tr><tr>
+        <td>
+          109
+        </td>
+        <td>
+          770
+        </td>
+        <td>
+          3785
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c &lt;- context(&quot;Contract is not in unsigned State&quot;) { c.asUnsigned() }\n    c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }\n    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          109
+        </td>
+        <td>
+          772
+        </td>
+        <td>
+          3837
+          -
+          3851
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          asUnsigned
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.asUnsigned()
+        </td>
+      </tr><tr>
+        <td>
+          110
+        </td>
+        <td>
+          774
+        </td>
+        <td>
+          3863
+          -
+          3919
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }
+        </td>
+      </tr><tr>
+        <td>
+          110
+        </td>
+        <td>
+          773
+        </td>
+        <td>
+          3858
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c &lt;- context(&quot;Failed to sign by Party1&quot;) { c.signByParty1() }\n    c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          110
+        </td>
+        <td>
+          775
+        </td>
+        <td>
+          3901
+          -
+          3917
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.signByParty1()
+        </td>
+      </tr><tr>
+        <td>
+          111
+        </td>
+        <td>
+          777
+        </td>
+        <td>
+          3929
+          -
+          3985
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }
+        </td>
+      </tr><tr>
+        <td>
+          111
+        </td>
+        <td>
+          776
+        </td>
+        <td>
+          3924
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c &lt;- context(&quot;Failed to sign by Party2&quot;) { c.signByParty2() }\n    _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          111
+        </td>
+        <td>
+          778
+        </td>
+        <td>
+          3967
+          -
+          3983
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          signByParty2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.signByParty2()
+        </td>
+      </tr><tr>
+        <td>
+          112
+        </td>
+        <td>
+          779
+        </td>
+        <td>
+          3990
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _ &lt;- context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }\n    _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          112
+        </td>
+        <td>
+          781
+        </td>
+        <td>
+          4039
+          -
+          4080
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.sendEmail(c.party1, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          112
+        </td>
+        <td>
+          780
+        </td>
+        <td>
+          3995
+          -
+          4082
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to send email to Party1&quot;) { c.sendEmail(c.party1, &quot;Contract signed!&quot;) }
+        </td>
+      </tr><tr>
+        <td>
+          113
+        </td>
+        <td>
+          783
+        </td>
+        <td>
+          4092
+          -
+          4179
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          context
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }
+        </td>
+      </tr><tr>
+        <td>
+          113
+        </td>
+        <td>
+          786
+        </td>
+        <td>
+          4087
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          113
+        </td>
+        <td>
+          782
+        </td>
+        <td>
+          4087
+          -
+          4191
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _ &lt;- context(&quot;Failed to send email to Party2&quot;) { c.sendEmail(c.party2, &quot;Contract signed!&quot;) }\n  yield (c)
+        </td>
+      </tr><tr>
+        <td>
+          113
+        </td>
+        <td>
+          784
+        </td>
+        <td>
+          4136
+          -
+          4177
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          sendEmail
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c.sendEmail(c.party2, &quot;Contract signed!&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          114
+        </td>
+        <td>
+          785
+        </td>
+        <td>
+          4189
+          -
+          4190
+        </td>
+        <td>
+          Ident
+        </td>
+        <td>
+          c
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          c
+        </td>
+      </tr><tr>
+        <td>
+          115
+        </td>
+        <td>
+          788
+        </td>
+        <td>
+          4230
+          -
+          4266
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Operation failed: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          115
+        </td>
+        <td>
+          787
+        </td>
+        <td>
+          4222
+          -
+          4267
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Operation failed: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          115
+        </td>
+        <td>
+          790
+        </td>
+        <td>
+          4219
+          -
+          4267
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(s&quot;Operation failed: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          115
+        </td>
+        <td>
+          789
+        </td>
+        <td>
+          4252
+          -
+          4264
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          116
+        </td>
+        <td>
+          792
+        </td>
+        <td>
+          4288
+          -
+          4342
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          116
+        </td>
+        <td>
+          791
+        </td>
+        <td>
+          4291
+          -
+          4342
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(&quot;Contract process completed successfully.&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          118
+        </td>
+        <td>
+          798
+        </td>
+        <td>
+          4344
+          -
+          4358
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          main
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          @main def main
+        </td>
+      </tr><tr>
+        <td>
+          119
+        </td>
+        <td>
+          794
+        </td>
+        <td>
+          4371
+          -
+          4381
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          example1
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          example1()
+        </td>
+      </tr><tr>
+        <td>
+          120
+        </td>
+        <td>
+          795
+        </td>
+        <td>
+          4384
+          -
+          4394
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          example2
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          example2()
+        </td>
+      </tr><tr>
+        <td>
+          121
+        </td>
+        <td>
+          796
+        </td>
+        <td>
+          4397
+          -
+          4407
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          example3
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          example3()
+        </td>
+      </tr><tr>
+        <td>
+          122
+        </td>
+        <td>
+          797
+        </td>
+        <td>
+          4410
+          -
+          4420
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          example4
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          example4()
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

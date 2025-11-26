@@ -1,0 +1,1488 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          playground/play2/block.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>package playground.play2
+</span>2 <span style=''>
+</span>3 <span style=''>import scala.collection.mutable
+</span>4 <span style=''>import scala.util.{Failure, Success, Try}
+</span>5 <span style=''>
+</span>6 <span style=''>enum TenantStatus:
+</span>7 <span style=''>  case Unverified
+</span>8 <span style=''>  case Verified(date: String)
+</span>9 <span style=''>
+</span>10 <span style=''>// Phantom types for compile-time status tracking
+</span>11 <span style=''>sealed trait VerificationState
+</span>12 <span style=''>object VerificationState:
+</span>13 <span style=''>  trait Unverified extends VerificationState
+</span>14 <span style=''>  trait Verified   extends VerificationState
+</span>15 <span style=''>
+</span>16 <span style=''>case class Tenant[S &lt;: VerificationState](id: String, name: String, status: TenantStatus)
+</span>17 <span style=''>
+</span>18 <span style=''>object Tenant:
+</span>19 <span style=''>  </span><span style='background: #F0ADAD'>def unverified</span><span style=''>(id: String, name: String): Tenant[VerificationState.Unverified] =
+</span>20 <span style=''>    Tenant[VerificationState.Unverified](id, name, TenantStatus.Unverified)
+</span>21 <span style=''>
+</span>22 <span style=''>  </span><span style='background: #F0ADAD'>def verified</span><span style=''>(id: String, name: String, date: String): Tenant[VerificationState.Verified] =
+</span>23 <span style=''>    Tenant[VerificationState.Verified](id, name, TenantStatus.Verified(date))
+</span>24 <span style=''>
+</span>25 <span style=''>object TenantStore:
+</span>26 <span style=''>  private val unverifiedTenants = </span><span style='background: #F0ADAD'>mutable.Map[String, Tenant[VerificationState.Unverified]]()</span><span style=''>
+</span>27 <span style=''>  private val verifiedTenants   = </span><span style='background: #F0ADAD'>mutable.Map[String, Tenant[VerificationState.Verified]]()</span><span style=''>
+</span>28 <span style=''>
+</span>29 <span style=''>  </span><span style='background: #F0ADAD'>def addUnverified</span><span style=''>(tenant: Tenant[VerificationState.Unverified]): Unit =
+</span>30 <span style=''>    </span><span style='background: #F0ADAD'>unverifiedTenants.put(tenant.id, tenant)</span><span style=''>
+</span>31 <span style=''>
+</span>32 <span style=''>  </span><span style='background: #F0ADAD'>def addVerified</span><span style=''>(tenant: Tenant[VerificationState.Verified]): Unit =
+</span>33 <span style=''>    </span><span style='background: #F0ADAD'>verifiedTenants.put(tenant.id, tenant)</span><span style=''>
+</span>34 <span style=''>
+</span>35 <span style=''>  </span><span style='background: #F0ADAD'>def getUnverifiedById</span><span style=''>(id: String): Try[Tenant[VerificationState.Unverified]] =
+</span>36 <span style=''>    </span><span style='background: #F0ADAD'>unverifiedTenants.get(id)</span><span style=''> match
+</span>37 <span style=''>      case Some(tenant) </span><span style='background: #F0ADAD'>=&gt; Success(tenant)</span><span style=''>
+</span>38 <span style=''>      case None         </span><span style='background: #F0ADAD'>=&gt; Failure(new NoSuchElementException(s&quot;Unverified tenant with id '$id' not found&quot;))</span><span style=''>
+</span>39 <span style=''>
+</span>40 <span style=''>  </span><span style='background: #F0ADAD'>def getVerifiedById</span><span style=''>(id: String): Try[Tenant[VerificationState.Verified]] =
+</span>41 <span style=''>    </span><span style='background: #F0ADAD'>verifiedTenants.get(id)</span><span style=''> match
+</span>42 <span style=''>      case Some(tenant) </span><span style='background: #F0ADAD'>=&gt; Success(tenant)</span><span style=''>
+</span>43 <span style=''>      case None         </span><span style='background: #F0ADAD'>=&gt; Failure(new NoSuchElementException(s&quot;Verified tenant with id '$id' not found&quot;))</span><span style=''>
+</span>44 <span style=''>
+</span>45 <span style=''>inline def withLogging[A](block: =&gt; A): A =
+</span>46 <span style=''>  println(&quot;start&quot;)
+</span>47 <span style=''>  block
+</span>48 <span style=''>
+</span>49 <span style=''></span><span style='background: #F0ADAD'>def summarize</span><span style=''>(tenant: Tenant[VerificationState.Verified]): Try[String] =
+</span>50 <span style=''>  Success:
+</span>51 <span style=''>    </span><span style='background: #F0ADAD'>s&quot;Tenant ${tenant.name} is verified as of ${tenant.status.asInstanceOf[TenantStatus.Verified].date}.&quot;</span><span style=''>
+</span>52 <span style=''>
+</span>53 <span style=''>// Compile-time proof: can only verify unverified tenants!
+</span>54 <span style=''></span><span style='background: #F0ADAD'>def verifyTenant</span><span style=''>(tenant: Tenant[VerificationState.Unverified]): Try[Tenant[VerificationState.Verified]] =
+</span>55 <span style=''>  </span><span style='background: #F0ADAD'>println(s&quot;Verifying tenant ${tenant.name}...&quot;)</span><span style=''>
+</span>56 <span style=''>  val verifiedTenant = </span><span style='background: #F0ADAD'>Tenant.verified(tenant.id, tenant.name, &quot;2025-01-01&quot;)</span><span style=''>
+</span>57 <span style=''>  </span><span style='background: #F0ADAD'>TenantStore.addVerified(verifiedTenant)</span><span style=''>
+</span>58 <span style=''>  Success(verifiedTenant)
+</span>59 <span style=''>
+</span>60 <span style=''></span><span style='background: #F0ADAD'>def fetchInput</span><span style=''>(): Try[String] =
+</span>61 <span style=''>  </span><span style='background: #F0ADAD'>println(&quot;Enter tenant ID:&quot;)</span><span style=''>
+</span>62 <span style=''>  </span><span style='background: #F0ADAD'>Try(scala.io.StdIn.readLine())</span><span style=''>
+</span>63 <span style=''>
+</span>64 <span style=''></span><span style='background: #F0ADAD'>def err</span><span style=''>[A](context: String)(block: =&gt; Try[A]): Try[A] =
+</span>65 <span style=''>  </span><span style='background: #F0ADAD'>block.recoverWith:
+</span>66 <span style=''></span><span style='background: #F0ADAD'>    case e =&gt; Failure(new Exception(s&quot;$context: ${e.getMessage}&quot;, e))</span><span style=''>
+</span>67 <span style=''>
+</span>68 <span style=''></span><span style='background: #F0ADAD'>@main def main</span><span style=''>(): Unit =
+</span>69 <span style=''>  </span><span style='background: #F0ADAD'>TenantStore.addUnverified(Tenant.unverified(&quot;abc&quot;, &quot;Test Tenant&quot;))</span><span style=''>
+</span>70 <span style=''>
+</span>71 <span style=''>  val result = </span><span style='background: #F0ADAD'>for
+</span>72 <span style=''></span><span style='background: #F0ADAD'>    x &lt;- err(&quot;Fetching input failed&quot;)(fetchInput())
+</span>73 <span style=''></span><span style='background: #F0ADAD'>    x &lt;- err(&quot;Fetching unverified Tenant failed&quot;)(TenantStore.getUnverifiedById(x))
+</span>74 <span style=''></span><span style='background: #F0ADAD'>    x &lt;- err(&quot;Tenant verification failed&quot;)(verifyTenant(x))
+</span>75 <span style=''></span><span style='background: #F0ADAD'>    x &lt;- err(&quot;Summary failed&quot;)(summarize(x))
+</span>76 <span style=''></span><span style='background: #F0ADAD'>  yield x</span><span style=''>
+</span>77 <span style=''>
+</span>78 <span style=''>  </span><span style='background: #F0ADAD'>result.recover(e =&gt; s&quot;Error: ${e.getMessage}&quot;).foreach(println)</span><span style=''>
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          19
+        </td>
+        <td>
+          573
+        </td>
+        <td>
+          475
+          -
+          489
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          unverified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def unverified
+        </td>
+      </tr><tr>
+        <td>
+          22
+        </td>
+        <td>
+          574
+        </td>
+        <td>
+          635
+          -
+          647
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          verified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def verified
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          575
+        </td>
+        <td>
+          859
+          -
+          918
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          mutable.Map[String, Tenant[VerificationState.Unverified]]()
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          576
+        </td>
+        <td>
+          953
+          -
+          1010
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          mutable.Map[String, Tenant[VerificationState.Verified]]()
+        </td>
+      </tr><tr>
+        <td>
+          29
+        </td>
+        <td>
+          578
+        </td>
+        <td>
+          1014
+          -
+          1031
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          addUnverified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def addUnverified
+        </td>
+      </tr><tr>
+        <td>
+          30
+        </td>
+        <td>
+          577
+        </td>
+        <td>
+          1090
+          -
+          1130
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          put
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          unverifiedTenants.put(tenant.id, tenant)
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          580
+        </td>
+        <td>
+          1134
+          -
+          1149
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          addVerified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def addVerified
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          579
+        </td>
+        <td>
+          1206
+          -
+          1244
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          put
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          verifiedTenants.put(tenant.id, tenant)
+        </td>
+      </tr><tr>
+        <td>
+          35
+        </td>
+        <td>
+          586
+        </td>
+        <td>
+          1248
+          -
+          1269
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          getUnverifiedById
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def getUnverifiedById
+        </td>
+      </tr><tr>
+        <td>
+          36
+        </td>
+        <td>
+          581
+        </td>
+        <td>
+          1331
+          -
+          1356
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          unverifiedTenants.get(id)
+        </td>
+      </tr><tr>
+        <td>
+          37
+        </td>
+        <td>
+          582
+        </td>
+        <td>
+          1387
+          -
+          1405
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Success(tenant)
+        </td>
+      </tr><tr>
+        <td>
+          38
+        </td>
+        <td>
+          585
+        </td>
+        <td>
+          1430
+          -
+          1514
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Failure(new NoSuchElementException(s&quot;Unverified tenant with id '$id' not found&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          38
+        </td>
+        <td>
+          584
+        </td>
+        <td>
+          1468
+          -
+          1512
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Unverified tenant with id '$id' not found&quot;
+        </td>
+      </tr><tr>
+        <td>
+          38
+        </td>
+        <td>
+          583
+        </td>
+        <td>
+          1441
+          -
+          1513
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new NoSuchElementException(s&quot;Unverified tenant with id '$id' not found&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          40
+        </td>
+        <td>
+          592
+        </td>
+        <td>
+          1518
+          -
+          1537
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          getVerifiedById
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def getVerifiedById
+        </td>
+      </tr><tr>
+        <td>
+          41
+        </td>
+        <td>
+          587
+        </td>
+        <td>
+          1597
+          -
+          1620
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          get
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          verifiedTenants.get(id)
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          588
+        </td>
+        <td>
+          1651
+          -
+          1669
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Success(tenant)
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          591
+        </td>
+        <td>
+          1694
+          -
+          1776
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Failure(new NoSuchElementException(s&quot;Verified tenant with id '$id' not found&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          590
+        </td>
+        <td>
+          1732
+          -
+          1774
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Verified tenant with id '$id' not found&quot;
+        </td>
+      </tr><tr>
+        <td>
+          43
+        </td>
+        <td>
+          589
+        </td>
+        <td>
+          1705
+          -
+          1775
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new NoSuchElementException(s&quot;Verified tenant with id '$id' not found&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          49
+        </td>
+        <td>
+          594
+        </td>
+        <td>
+          1850
+          -
+          1863
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          summarize
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def summarize
+        </td>
+      </tr><tr>
+        <td>
+          51
+        </td>
+        <td>
+          593
+        </td>
+        <td>
+          1938
+          -
+          2039
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Tenant ${tenant.name} is verified as of ${tenant.status.asInstanceOf[TenantStatus.Verified].date}.&quot;
+        </td>
+      </tr><tr>
+        <td>
+          54
+        </td>
+        <td>
+          599
+        </td>
+        <td>
+          2100
+          -
+          2116
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          verifyTenant
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def verifyTenant
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          596
+        </td>
+        <td>
+          2216
+          -
+          2253
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Verifying tenant ${tenant.name}...&quot;
+        </td>
+      </tr><tr>
+        <td>
+          55
+        </td>
+        <td>
+          595
+        </td>
+        <td>
+          2208
+          -
+          2254
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(s&quot;Verifying tenant ${tenant.name}...&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          56
+        </td>
+        <td>
+          597
+        </td>
+        <td>
+          2278
+          -
+          2331
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          verified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Tenant.verified(tenant.id, tenant.name, &quot;2025-01-01&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          57
+        </td>
+        <td>
+          598
+        </td>
+        <td>
+          2334
+          -
+          2373
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addVerified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          TenantStore.addVerified(verifiedTenant)
+        </td>
+      </tr><tr>
+        <td>
+          60
+        </td>
+        <td>
+          603
+        </td>
+        <td>
+          2401
+          -
+          2415
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          fetchInput
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def fetchInput
+        </td>
+      </tr><tr>
+        <td>
+          61
+        </td>
+        <td>
+          600
+        </td>
+        <td>
+          2435
+          -
+          2462
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println(&quot;Enter tenant ID:&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          602
+        </td>
+        <td>
+          2469
+          -
+          2494
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          readLine
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          scala.io.StdIn.readLine()
+        </td>
+      </tr><tr>
+        <td>
+          62
+        </td>
+        <td>
+          601
+        </td>
+        <td>
+          2465
+          -
+          2495
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Try(scala.io.StdIn.readLine())
+        </td>
+      </tr><tr>
+        <td>
+          64
+        </td>
+        <td>
+          609
+        </td>
+        <td>
+          2497
+          -
+          2504
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          err
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def err
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          606
+        </td>
+        <td>
+          2610
+          -
+          2638
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;$context: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          608
+        </td>
+        <td>
+          2585
+          -
+          2643
+        </td>
+        <td>
+          Block
+        </td>
+        <td>
+          &lt;none&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          =&gt; Failure(new Exception(s&quot;$context: ${e.getMessage}&quot;, e))
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          605
+        </td>
+        <td>
+          2596
+          -
+          2642
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          &lt;init&gt;
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          new Exception(s&quot;$context: ${e.getMessage}&quot;, e)
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          604
+        </td>
+        <td>
+          2555
+          -
+          2643
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          recoverWith
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          block.recoverWith:\n    case e =&gt; Failure(new Exception(s&quot;$context: ${e.getMessage}&quot;, e))
+        </td>
+      </tr><tr>
+        <td>
+          66
+        </td>
+        <td>
+          607
+        </td>
+        <td>
+          2624
+          -
+          2636
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          68
+        </td>
+        <td>
+          629
+        </td>
+        <td>
+          2645
+          -
+          2659
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          main
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          @main def main
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          611
+        </td>
+        <td>
+          2698
+          -
+          2737
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          unverified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Tenant.unverified(&quot;abc&quot;, &quot;Test Tenant&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          69
+        </td>
+        <td>
+          610
+        </td>
+        <td>
+          2672
+          -
+          2738
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          addUnverified
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          TenantStore.addUnverified(Tenant.unverified(&quot;abc&quot;, &quot;Test Tenant&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          71
+        </td>
+        <td>
+          612
+        </td>
+        <td>
+          2755
+          -
+          3009
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          for\n    x &lt;- err(&quot;Fetching input failed&quot;)(fetchInput())\n    x &lt;- err(&quot;Fetching unverified Tenant failed&quot;)(TenantStore.getUnverifiedById(x))\n    x &lt;- err(&quot;Tenant verification failed&quot;)(verifyTenant(x))\n    x &lt;- err(&quot;Summary failed&quot;)(summarize(x))\n  yield x
+        </td>
+      </tr><tr>
+        <td>
+          72
+        </td>
+        <td>
+          614
+        </td>
+        <td>
+          2797
+          -
+          2809
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          fetchInput
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          fetchInput()
+        </td>
+      </tr><tr>
+        <td>
+          72
+        </td>
+        <td>
+          613
+        </td>
+        <td>
+          2768
+          -
+          2810
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          err
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err(&quot;Fetching input failed&quot;)(fetchInput())
+        </td>
+      </tr><tr>
+        <td>
+          73
+        </td>
+        <td>
+          615
+        </td>
+        <td>
+          2815
+          -
+          3009
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          x &lt;- err(&quot;Fetching unverified Tenant failed&quot;)(TenantStore.getUnverifiedById(x))\n    x &lt;- err(&quot;Tenant verification failed&quot;)(verifyTenant(x))\n    x &lt;- err(&quot;Summary failed&quot;)(summarize(x))\n  yield x
+        </td>
+      </tr><tr>
+        <td>
+          73
+        </td>
+        <td>
+          617
+        </td>
+        <td>
+          2861
+          -
+          2893
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getUnverifiedById
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          TenantStore.getUnverifiedById(x)
+        </td>
+      </tr><tr>
+        <td>
+          73
+        </td>
+        <td>
+          616
+        </td>
+        <td>
+          2820
+          -
+          2894
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          err
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err(&quot;Fetching unverified Tenant failed&quot;)(TenantStore.getUnverifiedById(x))
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          618
+        </td>
+        <td>
+          2899
+          -
+          3009
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          flatMap
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          x &lt;- err(&quot;Tenant verification failed&quot;)(verifyTenant(x))\n    x &lt;- err(&quot;Summary failed&quot;)(summarize(x))\n  yield x
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          620
+        </td>
+        <td>
+          2938
+          -
+          2953
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          verifyTenant
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          verifyTenant(x)
+        </td>
+      </tr><tr>
+        <td>
+          74
+        </td>
+        <td>
+          619
+        </td>
+        <td>
+          2904
+          -
+          2954
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          err
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err(&quot;Tenant verification failed&quot;)(verifyTenant(x))
+        </td>
+      </tr><tr>
+        <td>
+          75
+        </td>
+        <td>
+          621
+        </td>
+        <td>
+          2959
+          -
+          3009
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          map
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          x &lt;- err(&quot;Summary failed&quot;)(summarize(x))\n  yield x
+        </td>
+      </tr><tr>
+        <td>
+          75
+        </td>
+        <td>
+          623
+        </td>
+        <td>
+          2986
+          -
+          2998
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          summarize
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          summarize(x)
+        </td>
+      </tr><tr>
+        <td>
+          75
+        </td>
+        <td>
+          622
+        </td>
+        <td>
+          2964
+          -
+          2999
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          err
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          err(&quot;Summary failed&quot;)(summarize(x))
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          627
+        </td>
+        <td>
+          3044
+          -
+          3056
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          getMessage
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          e.getMessage
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          624
+        </td>
+        <td>
+          3013
+          -
+          3076
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          foreach
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          result.recover(e =&gt; s&quot;Error: ${e.getMessage}&quot;).foreach(println)
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          626
+        </td>
+        <td>
+          3033
+          -
+          3058
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          s
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          s&quot;Error: ${e.getMessage}&quot;
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          625
+        </td>
+        <td>
+          3013
+          -
+          3059
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          recover
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          result.recover(e =&gt; s&quot;Error: ${e.getMessage}&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          78
+        </td>
+        <td>
+          628
+        </td>
+        <td>
+          3068
+          -
+          3075
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          println
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          println
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>

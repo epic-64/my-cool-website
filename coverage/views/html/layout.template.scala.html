@@ -1,0 +1,507 @@
+<html>
+      <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title id="title">
+          views/html/layout.template.scala.html
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/css/theme.default.min.css" type="text/css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.20.1/js/jquery.tablesorter.min.js"></script><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" type="text/css"/><script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script type="text/javascript">
+        $(document).ready(function() {$(".tablesorter").tablesorter();});
+      </script>
+        <style>
+          table.codegrid { font-family: monospace; font-size: 12px; width: auto!important; }table.statementlist { width: auto!important; font-size: 13px; } table.codegrid td { padding: 0!important; border: 0!important } table td.linenumber { width: 40px!important; } 
+        </style>
+      </head>
+      <body style="font-family: monospace;">
+        <ul class="nav nav-tabs">
+          <li>
+            <a href="#codegrid" data-toggle="tab">Codegrid</a>
+          </li>
+          <li>
+            <a href="#statementlist" data-toggle="tab">Statement List</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="codegrid">
+            <pre style='font-size: 12pt; font-family: courier, monospace;'>1 <span style=''>
+</span>2 <span style=''>package views.html
+</span>3 <span style=''>
+</span>4 <span style=''>import _root_.play.twirl.api.TwirlFeatureImports.*
+</span>5 <span style=''>import _root_.play.twirl.api.TwirlHelperImports.*
+</span>6 <span style=''>import scala.language.adhocExtensions
+</span>7 <span style=''>import _root_.play.twirl.api.Html
+</span>8 <span style=''>import _root_.play.twirl.api.JavaScript
+</span>9 <span style=''>import _root_.play.twirl.api.Txt
+</span>10 <span style=''>import _root_.play.twirl.api.Xml
+</span>11 <span style=''>
+</span>12 <span style=''>object layout extends _root_.play.twirl.api.BaseScalaTemplate[play.twirl.api.HtmlFormat.Appendable,_root_.play.twirl.api.Format[play.twirl.api.HtmlFormat.Appendable]](play.twirl.api.HtmlFormat) with _root_.play.twirl.api.Template3[String,Long,Html,play.twirl.api.HtmlFormat.Appendable] {
+</span>13 <span style=''>
+</span>14 <span style=''>  /**/
+</span>15 <span style=''>  </span><span style='background: #F0ADAD'>def apply</span><span style=''>/*1.2*/(title: String, frontendVersion: Long)(content: Html):play.twirl.api.HtmlFormat.Appendable = {
+</span>16 <span style=''>    </span><span style='background: #F0ADAD'>_display_ {
+</span>17 <span style=''></span><span style='background: #F0ADAD'>      {
+</span>18 <span style=''></span><span style='background: #F0ADAD'>
+</span>19 <span style=''></span><span style='background: #F0ADAD'>
+</span>20 <span style=''></span><span style='background: #F0ADAD'>Seq[Any](format.raw/*2.1*/(&quot;&quot;&quot;
+</span>21 <span style=''></span><span style='background: #F0ADAD'>&quot;&quot;&quot;),format.raw/*3.1*/(&quot;&quot;&quot;&lt;!DOCTYPE html&gt;
+</span>22 <span style=''></span><span style='background: #F0ADAD'>&lt;html lang=&quot;en&quot;&gt;
+</span>23 <span style=''></span><span style='background: #F0ADAD'>    &lt;head&gt;
+</span>24 <span style=''></span><span style='background: #F0ADAD'>        &lt;meta charset=&quot;UTF-8&quot;&gt;
+</span>25 <span style=''></span><span style='background: #F0ADAD'>        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+</span>26 <span style=''></span><span style='background: #F0ADAD'>        &lt;title&gt;&quot;&quot;&quot;),_display_(/*8.17*/title),format.raw/*8.22*/(&quot;&quot;&quot;&lt;/title&gt;
+</span>27 <span style=''></span><span style='background: #F0ADAD'>        &lt;link rel=&quot;stylesheet&quot; href=&quot;/assets/css/style.css?v=&quot;&quot;&quot;),_display_(/*9.63*/frontendVersion),format.raw/*9.78*/(&quot;&quot;&quot;&quot;&gt;
+</span>28 <span style=''></span><span style='background: #F0ADAD'>        &lt;script src=&quot;/assets/js/htmx.2.0.0.min.js&quot;&gt;&lt;/script&gt;
+</span>29 <span style=''></span><span style='background: #F0ADAD'>    &lt;/head&gt;
+</span>30 <span style=''></span><span style='background: #F0ADAD'>    &lt;body&gt;
+</span>31 <span style=''></span><span style='background: #F0ADAD'>        &lt;div class=&quot;container&quot;&gt;
+</span>32 <span style=''></span><span style='background: #F0ADAD'>            &quot;&quot;&quot;),_display_(/*14.14*/content),format.raw/*14.21*/(&quot;&quot;&quot;
+</span>33 <span style=''></span><span style='background: #F0ADAD'>        &quot;&quot;&quot;),format.raw/*15.9*/(&quot;&quot;&quot;&lt;/div&gt;
+</span>34 <span style=''></span><span style='background: #F0ADAD'>    &lt;/body&gt;
+</span>35 <span style=''></span><span style='background: #F0ADAD'>&lt;/html&gt;&quot;&quot;&quot;))
+</span>36 <span style=''></span><span style='background: #F0ADAD'>      }
+</span>37 <span style=''></span><span style='background: #F0ADAD'>    }</span><span style=''>
+</span>38 <span style=''>  }
+</span>39 <span style=''>
+</span>40 <span style=''>  </span><span style='background: #F0ADAD'>def render</span><span style=''>(title:String,frontendVersion:Long,content:Html): play.twirl.api.HtmlFormat.Appendable = </span><span style='background: #F0ADAD'>apply(title,frontendVersion)(content)</span><span style=''>
+</span>41 <span style=''>
+</span>42 <span style=''>  </span><span style='background: #F0ADAD'>def f</span><span style=''>:((String,Long) =&gt; (Html) =&gt; play.twirl.api.HtmlFormat.Appendable) = (title,frontendVersion) =&gt; (content) =&gt; </span><span style='background: #F0ADAD'>apply(title,frontendVersion)(content)</span><span style=''>
+</span>43 <span style=''>
+</span>44 <span style=''>  </span><span style='background: #F0ADAD'>def ref</span><span style=''>: this.type = this
+</span>45 <span style=''>
+</span>46 <span style=''>}
+</span>47 <span style=''>
+</span>48 <span style=''>
+</span>49 <span style=''>              /*
+</span>50 <span style=''>                  -- GENERATED --
+</span>51 <span style=''>                  SOURCE: src/main/twirl/views/layout.scala.html
+</span>52 <span style=''>                  HASH: 8be723cc5ec6df0d40f8e96a522b3af53f21163b
+</span>53 <span style=''>                  MATRIX: 615-&gt;1|762-&gt;55|789-&gt;56|985-&gt;226|1010-&gt;231|1107-&gt;302|1142-&gt;317|1301-&gt;449|1329-&gt;456|1365-&gt;465
+</span>54 <span style=''>                  LINES: 15-&gt;1|20-&gt;2|21-&gt;3|26-&gt;8|26-&gt;8|27-&gt;9|27-&gt;9|32-&gt;14|32-&gt;14|33-&gt;15
+</span>55 <span style=''>                  -- GENERATED --
+</span>56 <span style=''>              */
+</span>57 <span style=''>          
+</span></pre>
+          </div>
+          <div class="tab-pane" id="statementlist">
+            <table cellspacing="0" cellpadding="0" class="table statementlist">
+      <tr>
+        <th>Line</th>
+        <th>Stmt Id</th>
+        <th>Pos</th>
+        <th>Tree</th>
+        <th>Symbol</th>
+        <th>Tests</th>
+        <th>Code</th>
+      </tr><tr>
+        <td>
+          15
+        </td>
+        <td>
+          970
+        </td>
+        <td>
+          599
+          -
+          608
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def apply
+        </td>
+      </tr><tr>
+        <td>
+          16
+        </td>
+        <td>
+          959
+        </td>
+        <td>
+          714
+          -
+          1414
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_ {\n      {\n\n\nSeq[Any](format.raw/*2.1*/(&quot;&quot;&quot;\n&quot;&quot;&quot;),format.raw/*3.1*/(&quot;&quot;&quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;en&quot;&gt;\n    &lt;head&gt;\n        &lt;meta charset=&quot;UTF-8&quot;&gt;\n        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;\n        &lt;title&gt;&quot;&quot;&quot;),_display_(/*8.17*/title),format.raw/*8.22*/(&quot;&quot;&quot;&lt;/title&gt;\n        &lt;link rel=&quot;stylesheet&quot; href=&quot;/assets/css/style.css?v=&quot;&quot;&quot;),_display_(/*9.63*/frontendVersion),format.raw/*9.78*/(&quot;&quot;&quot;&quot;&gt;\n        &lt;script src=&quot;/assets/js/htmx.2.0.0.min.js&quot;&gt;&lt;/script&gt;\n    &lt;/head&gt;\n    &lt;body&gt;\n        &lt;div class=&quot;container&quot;&gt;\n            &quot;&quot;&quot;),_display_(/*14.14*/content),format.raw/*14.21*/(&quot;&quot;&quot;\n        &quot;&quot;&quot;),format.raw/*15.9*/(&quot;&quot;&quot;&lt;/div&gt;\n    &lt;/body&gt;\n&lt;/html&gt;&quot;&quot;&quot;))\n      }\n    }
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          961
+        </td>
+        <td>
+          745
+          -
+          771
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*2.1*/(&quot;&quot;&quot;\n&quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          20
+        </td>
+        <td>
+          960
+        </td>
+        <td>
+          736
+          -
+          1400
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          Seq[Any](format.raw/*2.1*/(&quot;&quot;&quot;\n&quot;&quot;&quot;),format.raw/*3.1*/(&quot;&quot;&quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;en&quot;&gt;\n    &lt;head&gt;\n        &lt;meta charset=&quot;UTF-8&quot;&gt;\n        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;\n        &lt;title&gt;&quot;&quot;&quot;),_display_(/*8.17*/title),format.raw/*8.22*/(&quot;&quot;&quot;&lt;/title&gt;\n        &lt;link rel=&quot;stylesheet&quot; href=&quot;/assets/css/style.css?v=&quot;&quot;&quot;),_display_(/*9.63*/frontendVersion),format.raw/*9.78*/(&quot;&quot;&quot;&quot;&gt;\n        &lt;script src=&quot;/assets/js/htmx.2.0.0.min.js&quot;&gt;&lt;/script&gt;\n    &lt;/head&gt;\n    &lt;body&gt;\n        &lt;div class=&quot;container&quot;&gt;\n            &quot;&quot;&quot;),_display_(/*14.14*/content),format.raw/*14.21*/(&quot;&quot;&quot;\n        &quot;&quot;&quot;),format.raw/*15.9*/(&quot;&quot;&quot;&lt;/div&gt;\n    &lt;/body&gt;\n&lt;/html&gt;&quot;&quot;&quot;))
+        </td>
+      </tr><tr>
+        <td>
+          21
+        </td>
+        <td>
+          962
+        </td>
+        <td>
+          772
+          -
+          966
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*3.1*/(&quot;&quot;&quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;en&quot;&gt;\n    &lt;head&gt;\n        &lt;meta charset=&quot;UTF-8&quot;&gt;\n        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;\n        &lt;title&gt;&quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          964
+        </td>
+        <td>
+          992
+          -
+          1088
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*8.22*/(&quot;&quot;&quot;&lt;/title&gt;\n        &lt;link rel=&quot;stylesheet&quot; href=&quot;/assets/css/style.css?v=&quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          26
+        </td>
+        <td>
+          963
+        </td>
+        <td>
+          967
+          -
+          991
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_(/*8.17*/title)
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          965
+        </td>
+        <td>
+          1089
+          -
+          1123
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_(/*9.63*/frontendVersion)
+        </td>
+      </tr><tr>
+        <td>
+          27
+        </td>
+        <td>
+          966
+        </td>
+        <td>
+          1124
+          -
+          1281
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*9.78*/(&quot;&quot;&quot;&quot;&gt;\n        &lt;script src=&quot;/assets/js/htmx.2.0.0.min.js&quot;&gt;&lt;/script&gt;\n    &lt;/head&gt;\n    &lt;body&gt;\n        &lt;div class=&quot;container&quot;&gt;\n            &quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          968
+        </td>
+        <td>
+          1310
+          -
+          1346
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*14.21*/(&quot;&quot;&quot;\n        &quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          32
+        </td>
+        <td>
+          967
+        </td>
+        <td>
+          1282
+          -
+          1309
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          _display_
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          _display_(/*14.14*/content)
+        </td>
+      </tr><tr>
+        <td>
+          33
+        </td>
+        <td>
+          969
+        </td>
+        <td>
+          1347
+          -
+          1399
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          raw
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          format.raw/*15.9*/(&quot;&quot;&quot;&lt;/div&gt;\n    &lt;/body&gt;\n&lt;/html&gt;&quot;&quot;&quot;)
+        </td>
+      </tr><tr>
+        <td>
+          40
+        </td>
+        <td>
+          971
+        </td>
+        <td>
+          1521
+          -
+          1558
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          apply(title,frontendVersion)(content)
+        </td>
+      </tr><tr>
+        <td>
+          40
+        </td>
+        <td>
+          972
+        </td>
+        <td>
+          1422
+          -
+          1432
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          render
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def render
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          974
+        </td>
+        <td>
+          1562
+          -
+          1567
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          f
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def f
+        </td>
+      </tr><tr>
+        <td>
+          42
+        </td>
+        <td>
+          973
+        </td>
+        <td>
+          1676
+          -
+          1713
+        </td>
+        <td>
+          Apply
+        </td>
+        <td>
+          apply
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          apply(title,frontendVersion)(content)
+        </td>
+      </tr><tr>
+        <td>
+          44
+        </td>
+        <td>
+          975
+        </td>
+        <td>
+          1717
+          -
+          1724
+        </td>
+        <td>
+          DefDef
+        </td>
+        <td>
+          ref
+        </td>
+        <td>
+          
+        </td>
+        <td style="background: #F0ADAD">
+          def ref
+        </td>
+      </tr>
+    </table>
+          </div>
+        </div>
+      </body>
+    </html>
